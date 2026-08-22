@@ -78,7 +78,9 @@ The project started with a conventional retrieval implementation and was then re
                          │
                          ▼
                   Answer Generation
-Technologies
+
+                  
+## Technologies
 Python
 OpenAI
 ChromaDB
