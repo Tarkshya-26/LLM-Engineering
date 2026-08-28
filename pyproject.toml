@@ -1,12 +1,12 @@
 [project]
 name = "llm-engineering"
 version = "0.1.0"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
+    "openai-agents>=0.22.0",
     "beautifulsoup4>=4.15.0",
     "datasets>=4.5.0",
     "diffusers>=0.36.0",
-    "evaluation>=0.0.2",
     "gradio>=4.44.1",
     "ipykernel>=6.31.0",
     "ipython>=8.18.1",
@@ -28,4 +28,9 @@ dependencies = [
     "tiktoken>=0.13.0",
     "torch>=2.8.0",
     "transformers>=4.57.6",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
 ]

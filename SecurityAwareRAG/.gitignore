@@ -1,0 +1,7 @@
+# Generated Chroma vector store. Rebuild with:
+#   python pro_implementation/proIngest.py
+vector_db/
+pro_implementation/vector_db/
+
+# Python bytecode
+__pycache__/

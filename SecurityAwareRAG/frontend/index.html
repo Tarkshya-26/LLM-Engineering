@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SecurityAwareRAG — agentic security architecture</title>
+<style>
+:root{
+  --bg:#06080c; --ink:#0d1119; --ink2:#121822; --line:#1b2330; --line2:#28323f;
+  --txt:#e6ecf4; --dim:#8a95a6; --faint:#565f6e; --ghost:#2a3341;
+  --agent:#a97bff; --sec:#4f9dff; --gov:#ff5470; --ok:#3ddc97; --warn:#f6b23d;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;
+  -webkit-font-smoothing:antialiased}
+h1,h2{margin:0;font-weight:600;letter-spacing:-.02em}
+.mono{font-family:var(--mono)}
+.eyebrow{font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);
+  font-weight:600}
+
+header{height:56px;border-bottom:1px solid var(--line);display:flex;align-items:center;
+  padding:0 28px;gap:14px;background:rgba(13,17,25,.86);backdrop-filter:blur(10px);
+  position:sticky;top:0;z-index:20}
+header .brand{font-size:13.5px;font-weight:600;letter-spacing:-.01em}
+header .brand span{color:var(--faint);font-weight:400;margin-left:9px}
+header .stat{margin-left:auto;display:flex;gap:24px;font-family:var(--mono);font-size:11.5px;
+  color:var(--dim)}
+header .stat b{color:var(--txt);font-weight:600}
+
+.layout{display:grid;grid-template-columns:236px 1fr}
+nav{border-right:1px solid var(--line);background:var(--ink);padding:22px 0;
+  min-height:calc(100vh - 56px)}
+nav .eyebrow{padding:0 22px 12px}
+nav button{display:block;width:100%;text-align:left;background:none;border:0;cursor:pointer;
+  padding:9px 22px;border-left:2px solid transparent;transition:.14s;color:var(--dim)}
+nav button .t{font-size:12.5px;display:block;letter-spacing:-.01em}
+nav button .c{font-family:var(--mono);font-size:9.5px;color:var(--faint);display:block;margin-top:1px}
+nav button:hover{background:var(--ink2);color:var(--txt)}
+nav button.on{background:var(--ink2);color:#fff;border-left-color:var(--gov)}
+nav button.on .c{color:var(--dim)}
+
+main{padding:44px 52px 100px;max-width:1060px}
+
+/* ---- scenario head ---- */
+.head{margin-bottom:34px}
+.head h1{font-size:33px;line-height:1.1}
+.head .q{font-size:16px;color:var(--dim);margin-top:11px;max-width:700px}
+.head .meta{margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--faint)}
+
+/* ---- toggle ---- */
+.switch{display:inline-flex;border:1px solid var(--line2);border-radius:9px;overflow:hidden;
+  margin-bottom:8px}
+.switch button{background:var(--ink);border:0;color:var(--faint);padding:11px 26px;cursor:pointer;
+  font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.05em;transition:.2s}
+.switch button:hover{color:var(--dim)}
+.switch button.on{background:var(--ink2);color:#fff;box-shadow:inset 0 -2px 0 var(--gov)}
+.switch button.on.base{box-shadow:inset 0 -2px 0 var(--faint)}
+.switch-note{font-size:11.5px;color:var(--faint);margin-bottom:32px}
+
+/* ---- flow ---- */
+.flow{max-width:940px}
+.row{display:grid;grid-template-columns:330px 1fr;gap:30px;align-items:start}
+.node{position:relative;border:1px solid var(--line);background:var(--ink);border-radius:10px;
+  padding:14px 17px;transition:opacity .25s,border-color .25s,box-shadow .25s}
+.node .k{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.node .n{font-size:14.5px;font-weight:600;margin-top:3px;letter-spacing:-.01em}
+.node .s{font-size:11.5px;color:var(--faint);margin-top:4px;line-height:1.45}
+.node .chip{position:absolute;top:13px;right:15px;font-family:var(--mono);font-size:9px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.conn{height:24px;width:1px;background:var(--line2);margin-left:165px}
+.conn.dim{background:var(--ghost)}
+
+.node.io{background:transparent;border-style:solid;border-color:var(--line2)}
+.node.retrieval .k,.node.io .k{color:var(--faint)}
+.node.sec{border-color:#1e3a58}
+.node.sec .k,.node.sec .chip{color:var(--sec)}
+.node.agent{border-color:#4a3170;background:linear-gradient(180deg,#191129,#0f0b17);
+  padding:20px 17px}
+.node.agent .k,.node.agent .chip{color:var(--agent)}
+.node.agent .n{font-size:19px}
+.node.gov{border-color:var(--line2)}
+.node.gov.hot{border-color:var(--gov);background:linear-gradient(180deg,#1f0e15,#100a0e);
+  box-shadow:0 0 30px -16px var(--gov)}
+.node.gov.hot .k,.node.gov.hot .chip{color:var(--gov)}
+.node.out{border-color:#20443a}
+.node.out .k{color:var(--ok)}
+.node.ghost{opacity:.24;border-style:dashed;background:transparent}
+.node.ghost .chip{color:var(--faint)}
+
+/* evidence beside a node */
+.ev{padding-top:14px;font-size:12.5px;color:var(--dim);line-height:1.55}
+.ev .lbl{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);
+  display:block;margin-bottom:5px}
+.ev .mono{font-size:11.5px}
+.ev .big{font-family:var(--mono);font-size:15px;color:var(--txt)}
+.ev .hot{color:var(--gov);font-weight:600}
+.ev .good{color:var(--ok)}
+.ev .warn{color:var(--warn)}
+.ev .frac{font-family:var(--mono);font-size:11px;color:var(--faint)}
+.pill{display:inline-block;font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:3px;
+  margin:2px 4px 2px 0;border:1px solid var(--line2);color:var(--dim)}
+.pill.untrusted{color:var(--warn);border-color:#4a3a13}
+.pill.trusted{color:var(--ok);border-color:#17553c}
+.pill.none{color:var(--faint);border-style:dashed}
+
+/* ---- outcome ---- */
+.outcome{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:11px;overflow:hidden;margin:40px 0 34px}
+.outcome > div{background:var(--ink);padding:20px 24px}
+.outcome .eyebrow{margin-bottom:8px}
+.outcome .v{font-family:var(--mono);font-size:20px;font-weight:600}
+.outcome .v.bad{color:var(--gov)} .outcome .v.good{color:var(--ok)} .outcome .v.neu{color:var(--dim)}
+.outcome .sub{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:4px}
+
+/* ---- disclosure ---- */
+details{border:1px solid var(--line);border-radius:9px;margin-bottom:8px;background:var(--ink);
+  overflow:hidden}
+summary{cursor:pointer;padding:12px 20px;font-size:12.5px;color:var(--dim);list-style:none;
+  display:flex;gap:9px;align-items:center;user-select:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:'▸';color:var(--faint);font-size:10px;transition:.15s}
+details[open] summary::before{transform:rotate(90deg)}
+summary:hover{background:var(--ink2);color:var(--txt)}
+summary .cnt{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--faint)}
+.dbody{padding:6px 20px 20px;border-top:1px solid var(--line)}
+.runbar{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin:14px 0}
+.runbar button{font-family:var(--mono);font-size:11px;background:#06080c;border:1px solid var(--line2);
+  color:var(--dim);padding:5px 11px;border-radius:5px;cursor:pointer}
+.runbar button.on{border-color:var(--sec);color:#fff;background:var(--ink2)}
+.runbar .lab{font-size:11px;color:var(--faint);margin-right:6px}
+.kvr{display:flex;gap:12px;padding:6px 0;border-bottom:1px solid #141b25;font-size:12.5px}
+.kvr:last-child{border:0}
+.kvr .k{color:var(--faint);min-width:140px;font-size:11.5px}
+.kvr .v{font-family:var(--mono);font-size:11.5px;flex:1;word-break:break-word}
+.aline{font-family:var(--mono);font-size:11px;padding:5px 9px;border-radius:4px;margin-bottom:4px;
+  background:#06080c;border-left:2px solid var(--faint);word-break:break-word}
+.aline.PROPOSED{border-left-color:var(--warn);color:#ffcd7d}
+.aline.BLOCKED{border-left-color:var(--gov);color:#ff92a6}
+.aline.ALLOWED{border-left-color:var(--ok);color:#7fe3ba}
+pre{background:#06080c;border:1px solid var(--line);border-radius:7px;padding:13px;
+  font-family:var(--mono);font-size:11.5px;line-height:1.65;overflow-x:auto;margin:0;
+  white-space:pre-wrap;word-break:break-word;color:#c1cad7}
+.note{font-size:11px;color:var(--faint);margin-top:9px}
+.limits{margin-top:40px;border-top:1px solid var(--line);padding-top:20px}
+.limits ul{margin:12px 0 0;padding-left:17px;columns:2;column-gap:36px}
+.limits li{font-size:11.5px;color:var(--faint);margin-bottom:8px;line-height:1.55;break-inside:avoid}
+.limits li b{color:var(--dim)}
+.legend{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:26px;font-size:11px;color:var(--faint)}
+.legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;
+  vertical-align:middle}
+@media(max-width:960px){.layout{grid-template-columns:1fr}nav{min-height:0}
+  .row{grid-template-columns:1fr}.conn{margin-left:24px}.outcome,.limits ul{grid-template-columns:1fr;columns:1}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">SecurityAwareRAG <span>agentic security architecture</span></div>
+  <div class="stat" id="stat"></div>
+</header>
+<div class="layout">
+  <nav id="nav"></nav>
+  <main id="main"><p class="note">loading ./data/demo.json …</p></main>
+</div>
+<script src="./app.js"></script>
+</body>
+</html>
