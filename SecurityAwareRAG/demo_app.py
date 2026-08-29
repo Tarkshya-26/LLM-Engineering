@@ -209,6 +209,33 @@ def render_ops(trace, governed):
             f'<div class="panel-h second">Pipeline</div>{stages}</div>')
 
 
+def plain_history(history):
+    """Flatten Gradio's chat history into the plain {role, content} the pipeline wants.
+
+    Gradio 6's Chatbot does not hand back what you put in. It normalises every turn
+    into typed content parts:
+
+        {'role': 'user', 'metadata': None,
+         'content': [{'text': 'hey there', 'type': 'text'}], 'options': None}
+
+    Passing that straight through gives the Agents SDK a list where it expects text,
+    which fails only from the second turn onward - the first request has no history,
+    so it looks fine right up until someone asks a follow-up.
+    """
+    turns = []
+    for turn in history or []:
+        if not isinstance(turn, dict) or turn.get("role") not in ("user", "assistant"):
+            continue
+        content = turn.get("content")
+        if isinstance(content, list):
+            content = "".join(
+                part.get("text", "") for part in content if isinstance(part, dict)
+            )
+        if isinstance(content, str) and content.strip():
+            turns.append({"role": turn["role"], "content": content})
+    return turns
+
+
 def respond(message, history, merchant, governed):
     """Run the real pipeline and return the reply plus the operations panel."""
     history = history or []
@@ -217,7 +244,8 @@ def respond(message, history, merchant, governed):
 
     if governed:
         answer, chunks, trace = answer_with_trace(
-            message, RequestContext(merchant_id=merchant), history=history, phase=8)
+            message, RequestContext(merchant_id=merchant),
+            history=plain_history(history), phase=8)
     else:
         answer, chunks = answer_question(message)
         trace = build_baseline_trace(chunks, merchant)

@@ -243,7 +243,12 @@ def _conversation(history, evidence, question):
     turns = [
         {"role": t["role"], "content": t["content"]}
         for t in (history or [])[-HISTORY_TURNS:]
-        if t.get("role") in ("user", "assistant") and t.get("content")
+        # content must already be plain text - a caller passing structured content
+        # parts is skipped rather than forwarded into the SDK as a malformed item.
+        if isinstance(t, dict)
+        and t.get("role") in ("user", "assistant")
+        and isinstance(t.get("content"), str)
+        and t["content"].strip()
     ]
     return turns + [
         {"role": "user", "content": evidence},
