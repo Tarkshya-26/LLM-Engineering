@@ -217,7 +217,7 @@ def respond(message, history, merchant, governed):
 
     if governed:
         answer, chunks, trace = answer_with_trace(
-            message, RequestContext(merchant_id=merchant), phase=8)
+            message, RequestContext(merchant_id=merchant), history=history, phase=8)
     else:
         answer, chunks = answer_question(message)
         trace = build_baseline_trace(chunks, merchant)
@@ -247,6 +247,7 @@ with gr.Blocks(title="PayGuard Merchant Risk Desk") as demo:
                 box = gr.Textbox(placeholder="Ask about onboarding, risk tiering or settlement…",
                                  show_label=False, scale=8, autofocus=True)
                 send = gr.Button("Send", variant="primary", scale=1)
+                clear = gr.Button("Clear", scale=1)
             gr.Markdown("Scenarios — one click sets the signed-in merchant and runs the request.",
                         elem_classes="scenario-hint")
             with gr.Row(elem_classes="scenarios"):
@@ -255,6 +256,20 @@ with gr.Blocks(title="PayGuard Merchant Risk Desk") as demo:
             ops = gr.HTML(render_ops(None, True))
 
     inputs, outputs = [box, chat, merchant, governed], [chat, ops, box]
+
+    # Recording affordance: resets the transcript between takes without a page
+    # reload, which would also reset the governance toggle back to on.
+    clear.click(lambda g: ([], render_ops(None, g), ""), [governed], outputs)
+
+    # The transcript is carried into the agent, so it must be dropped when the
+    # authenticated identity changes. Authorization filters retrieval, not memory:
+    # an answer produced for one merchant stays readable in the transcript, and
+    # replaying it under a different identity would leak across tenants
+    # (failure mode F4 in security/authorization.py). Switching pipelines clears
+    # too - a baseline answer may contain data the governed pipeline would never
+    # have retrieved.
+    merchant.change(lambda g: ([], render_ops(None, g), ""), [governed], outputs)
+    governed.change(lambda g: ([], render_ops(None, g), ""), [governed], outputs)
     box.submit(respond, inputs, outputs)
     send.click(respond, inputs, outputs)
 

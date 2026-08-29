@@ -315,10 +315,12 @@ def answer_with_assessment(question, context: RequestContext, history=None, phas
     assessment = assess_evidence(chunks)
 
     if config.agent_action_governance and config.consequential_gate:
-        return _run_combined_pipeline(question, context, chunks, assessment, intent)
+        return _run_combined_pipeline(question, context, chunks, assessment, intent,
+                                      history or [])
 
     if config.agent_action_governance:
-        return _run_governed_agent(question, context, chunks, assessment, intent)
+        return _run_governed_agent(question, context, chunks, assessment, intent,
+                                   history or [])
 
     messages = build_messages(question, history or [], chunks, assessment, config)
 
@@ -371,7 +373,7 @@ def answer_with_assessment(question, context: RequestContext, history=None, phas
     return text, chunks, assessment, intent, outcome, trace
 
 
-def _run_combined_pipeline(question, context, chunks, assessment, intent):
+def _run_combined_pipeline(question, context, chunks, assessment, intent, history=None):
     """Phase 8. Both governance boundaries active, neither able to shadow the other.
 
         retrieval -> evidence assessment -> structured determination
@@ -389,7 +391,8 @@ def _run_combined_pipeline(question, context, chunks, assessment, intent):
     """
     from risk_agent import run_agent_structured
 
-    determination, session = run_agent_structured(question, context, chunks, assessment)
+    determination, session = run_agent_structured(question, context, chunks, assessment,
+                                                  history)
     retrieved_metadata = [chunk.metadata for chunk in chunks]
 
     # ---- BOUNDARY 1: DETERMINATION GOVERNANCE (Phase 5) -----------------
@@ -459,7 +462,7 @@ def _run_combined_pipeline(question, context, chunks, assessment, intent):
     return determination.answer, chunks, assessment, intent, session, trace_for(None)
 
 
-def _run_governed_agent(question, context, chunks, assessment, intent):
+def _run_governed_agent(question, context, chunks, assessment, intent, history=None):
     """Phase 7. The agent proposes; this function is where authority lives.
 
     Nothing the agent returns is treated as an authorization. Every recorded
@@ -469,7 +472,7 @@ def _run_governed_agent(question, context, chunks, assessment, intent):
     """
     from risk_agent import run_agent
 
-    agent_text, session = run_agent(question, context, chunks, assessment)
+    agent_text, session = run_agent(question, context, chunks, assessment, history)
     retrieved_metadata = [chunk.metadata for chunk in chunks]
 
     decisions = []

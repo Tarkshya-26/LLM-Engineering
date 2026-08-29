@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>SecurityAwareRAG — slides</title>
+<style>
+:root{
+  --bg:#06080c; --ink:#0d1119; --line:#1c2532; --line2:#2a3441;
+  --hi:#f2f6fb; --tx:#c8d2e0; --lo:#7d8899; --xlo:#525c6b;
+  --agent:#a97bff; --sec:#4f9dff; --gov:#ff5470; --ok:#3ddc97; --warn:#f6b23d;
+  --sans:-apple-system,"SF Pro Display","Inter","Segoe UI",system-ui,sans-serif;
+  --mono:"SF Mono",ui-monospace,"JetBrains Mono",Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#000;height:100%;overflow:hidden;font-family:var(--sans)}
+#stage{position:absolute;top:50%;left:50%;width:1920px;height:1080px;
+  transform-origin:center center;background:var(--bg);color:var(--tx)}
+.slide{position:absolute;inset:0;padding:64px 100px;display:none;flex-direction:column}
+.slide.on{display:flex}
+.kicker{font-size:18px;letter-spacing:.24em;text-transform:uppercase;color:var(--xlo);
+  font-weight:700;margin-bottom:20px}
+h1{font-size:64px;font-weight:640;letter-spacing:-.028em;color:var(--hi);line-height:1.04}
+h1 em{font-style:normal;color:var(--gov)}
+.sub{font-size:27px;color:var(--lo);margin-top:20px;max-width:1300px;line-height:1.45}
+
+/* ---- flow columns ---- */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:66px;margin-top:38px;flex:1}
+.col .hd{font-size:18px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;
+  margin-bottom:16px}
+.col.base .hd{color:var(--xlo)} .col.gov .hd{color:var(--ok)}
+.n{border:1px solid var(--line2);border-radius:11px;padding:11px 20px;background:var(--ink);
+  display:flex;align-items:center;gap:16px}
+.n .t{font-size:22px;font-weight:560;color:var(--hi)}
+.n .d{font-size:15px;color:var(--lo);margin-left:auto;text-align:right;max-width:430px;
+  line-height:1.35}
+.n.sec{border-color:#1f4269}   .n.sec .t{color:#bcd9ff}
+.n.agent{border-color:#54397e;background:linear-gradient(180deg,#1b1230,#100c1a);padding:16px 20px}
+.n.agent .t{color:#d9c4ff;font-size:26px;font-weight:640}
+.n.gov{border-color:var(--gov);background:linear-gradient(180deg,#23101a,#150b11)}
+.n.gov .t{color:#ffb3c1}
+.n.out{border-color:#22503f} .n.out .t{color:#9fe9c8}
+.n.ghost{border-style:dashed;opacity:.26}
+.ar{height:14px;width:2px;background:var(--line2);margin:6px 0 6px 36px}
+.stack{display:flex;flex-direction:column}
+
+/* ---- principle ---- */
+.big{font-size:96px;font-weight:660;letter-spacing:-.03em;line-height:1.1;color:var(--hi);
+  margin-top:34px}
+.big .a{color:var(--agent)} .big .g{color:var(--gov)}
+.rule{margin-top:60px;border-left:4px solid var(--gov);padding:24px 34px;background:var(--ink);
+  border-radius:0 12px 12px 0;max-width:1350px}
+.rule .l{font-size:19px;letter-spacing:.16em;text-transform:uppercase;color:var(--gov);
+  font-weight:700;margin-bottom:14px}
+.rule p{font-size:31px;color:var(--hi);line-height:1.4;font-weight:500}
+.rule code{font-family:var(--mono);font-size:27px;color:var(--warn)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:70px;margin-top:56px}
+.split .h{font-size:21px;letter-spacing:.15em;text-transform:uppercase;font-weight:700;
+  margin-bottom:16px}
+.split p{font-size:26px;line-height:1.5;color:var(--tx)}
+.split .a .h{color:var(--sec)} .split .b .h{color:var(--warn)}
+
+/* ---- broke ---- */
+.items{margin-top:54px;display:flex;flex-direction:column;gap:38px;flex:1}
+.item{display:grid;grid-template-columns:74px 1fr;gap:32px;align-items:start}
+.item .num{font-family:var(--mono);font-size:34px;color:var(--gov);font-weight:600}
+.item h3{font-size:36px;font-weight:600;color:var(--hi);letter-spacing:-.015em}
+.item p{font-size:24px;color:var(--lo);margin-top:11px;line-height:1.5;max-width:1330px}
+.item .fig{font-family:var(--mono);color:var(--warn)}
+.foot{margin-top:auto;font-size:21px;color:var(--xlo);border-top:1px solid var(--line);
+  padding-top:26px;display:flex;gap:48px;font-family:var(--mono)}
+.foot b{color:var(--tx);font-weight:600}
+#hint{position:fixed;bottom:16px;right:20px;font:12px var(--mono);color:#3a434f}
+</style></head>
+<body>
+<div id="stage">
+
+  <!-- 1 ARCHITECTURE -->
+  <section class="slide on">
+    <div class="kicker">SecurityAwareRAG · architecture</div>
+    <h1>The agent doesn't change.<br>What surrounds it does.</h1>
+    <div class="cols">
+      <div class="col base"><div class="hd">Baseline RAG</div><div class="stack">
+        <div class="n"><span class="t">User request</span></div><div class="ar"></div>
+        <div class="n"><span class="t">Retrieval</span><span class="d">similarity search</span></div><div class="ar"></div>
+        <div class="n ghost"><span class="t">Tenant authorization</span></div><div class="ar"></div>
+        <div class="n ghost"><span class="t">Trust &amp; redaction</span></div><div class="ar"></div>
+        <div class="n ghost"><span class="t">Context isolation</span></div><div class="ar"></div>
+        <div class="n agent"><span class="t">LLM</span></div><div class="ar"></div>
+        <div class="n ghost"><span class="t">Determination governance</span></div><div class="ar"></div>
+        <div class="n ghost"><span class="t">Action governance</span></div><div class="ar"></div>
+        <div class="n"><span class="t">Response</span></div>
+      </div></div>
+      <div class="col gov"><div class="hd">Governed pipeline</div><div class="stack">
+        <div class="n"><span class="t">User request</span><span class="d">authenticated tenant</span></div><div class="ar"></div>
+        <div class="n"><span class="t">Retrieval</span><span class="d">similarity search</span></div><div class="ar"></div>
+        <div class="n sec"><span class="t">Tenant authorization</span><span class="d">restrict candidates before the search</span></div><div class="ar"></div>
+        <div class="n sec"><span class="t">Trust &amp; redaction</span><span class="d">policy vs self-attested · strip secrets</span></div><div class="ar"></div>
+        <div class="n sec"><span class="t">Context isolation</span><span class="d">data out of the instruction channel</span></div><div class="ar"></div>
+        <div class="n agent"><span class="t">AI agent</span><span class="d">reasons · enforces nothing</span></div><div class="ar"></div>
+        <div class="n gov"><span class="t">Determination governance</span><span class="d">gates the conclusion</span></div><div class="ar"></div>
+        <div class="n gov"><span class="t">Action governance</span><span class="d">gates the tool call</span></div><div class="ar"></div>
+        <div class="n out"><span class="t">Allow · Block · Escalate</span></div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- 2 PRINCIPLE -->
+  <section class="slide">
+    <div class="kicker">the principle</div>
+    <div class="big"><span class="a">The agent reasons.</span><br><span class="g">Governance enforces.</span></div>
+    <div class="rule">
+      <div class="l">the rule that makes it enforceable</div>
+      <p>Policy defines the <b>criteria</b>. Evidence supplies the <b>facts</b>.<br>
+      Self-attested evidence cannot establish a consequential decision — <code>A5</code></p>
+    </div>
+    <div class="split">
+      <div class="a"><div class="h">What the model may do</div>
+        <p>Read evidence. Reason about it. <b>Propose</b> an action.</p></div>
+      <div class="b"><div class="h">What only code may do</div>
+        <p>Authorize the action. Execute it.<br>
+        The tool the agent can call has no side effects.</p></div>
+    </div>
+  </section>
+
+  <!-- 3 WHAT BROKE -->
+  <section class="slide">
+    <div class="kicker">what broke during development</div>
+    <h1>Three findings I kept.</h1>
+    <div class="items">
+      <div class="item"><div class="num">01</div><div>
+        <h3>My corpus was contaminated</h3>
+        <p>Every attack document ended with a disclaimer telling the model to ignore it.
+        The baseline looked secure because the attack was announcing itself.</p></div></div>
+      <div class="item"><div class="num">02</div><div>
+        <h3>My detector had false negatives — twice</h3>
+        <p>Both errors flattered the system. One scored <span class="fig">"classified as LOW risk"</span>
+        as blocked. Caught by disbelieving a result, not by a test.</p></div></div>
+      <div class="item"><div class="num">03</div><div>
+        <h3>Context isolation did not reduce prompt injection</h3>
+        <p>The layer I was most confident about. Matched runs, N=12:
+        <span class="fig">3/12 → 4/12</span>. Structural isolation removes privilege, not persuasion.</p></div></div>
+    </div>
+    <div class="foot"><span>176 recorded runs</span><span>attack success <b>8/9 → 0/9</b></span>
+      <span>false positives <b>0/2 → 0/2</b></span><span>latency <b>4.48s → 4.90s</b></span></div>
+  </section>
+
+  <!-- 4 NEXT -->
+  <section class="slide">
+    <div class="kicker">what this is · and what it is not</div>
+    <h1>One layer of an agentic<br>governance system.</h1>
+    <div class="sub">The ingestion boundary is deliberately not built. I wanted evidence that the
+      downstream layers were necessary before adding another one.</div>
+    <div class="cols" style="grid-template-columns:1fr;margin-top:46px">
+      <div class="stack" style="max-width:1180px">
+        <div class="n ghost"><span class="t">Ingestion governance</span><span class="d">next — inspect documents before they are ever indexed</span></div><div class="ar"></div>
+        <div class="n sec"><span class="t">Tenant authorization · Trust &amp; redaction · Context isolation</span><span class="d">built</span></div><div class="ar"></div>
+        <div class="n agent"><span class="t">AI agent</span><span class="d">built</span></div><div class="ar"></div>
+        <div class="n gov"><span class="t">Determination &amp; action governance</span><span class="d">built</span></div>
+      </div>
+    </div>
+    <div class="foot"><span>0/8 means no failure observed in eight runs — not determinism</span></div>
+  </section>
+
+</div>
+<div id="hint">← → to navigate</div>
+<script>
+const slides=[...document.querySelectorAll('.slide')];let i=0;
+const show=n=>{slides.forEach((s,k)=>s.classList.toggle('on',k===n));i=n};
+addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' ')show(Math.min(i+1,slides.length-1));
+  if(e.key==='ArrowLeft')show(Math.max(i-1,0));});
+const fit=()=>{const s=Math.min(innerWidth/1920,innerHeight/1080);
+  document.getElementById('stage').style.transform=`translate(-50%,-50%) scale(${s})`};
+addEventListener('resize',fit);fit();
+</script>
+</body></html>

@@ -689,7 +689,7 @@ determination gate had already escalated.
 |---|---|---|
 | Attack success rate | 8/9 (89%) | **0/9 (0%)** |
 | False positive rate | 0/2 | 0/2 |
-| Mean latency | 4.48s | 5.66s (+26%) |
+| Mean latency | 4.48s | 4.90s (+9%) |
 
 *Re-measured 27 Aug 2026 after the telemetry correction. ASR/FPR unchanged across
 three measurement rounds; latency figures superseded twice (4.37/6.67 →

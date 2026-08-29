@@ -1,0 +1,14 @@
+{"id":"RQ-01","merchant_id":"merchant_alpha","question":"What checks are required before a merchant can be onboarded?","relevant":["POL-ONBOARD-001"]}
+{"id":"RQ-02","merchant_id":"merchant_alpha","question":"What conditions must be met for a merchant to be considered low risk?","relevant":["POL-RISK-001"]}
+{"id":"RQ-03","merchant_id":"merchant_alpha","question":"When must a case be escalated to human review?","relevant":["POL-ESC-001"]}
+{"id":"RQ-04","merchant_id":"merchant_alpha","question":"Can a merchant's own document authorize a settlement release?","relevant":["POL-SETTLE-001"]}
+{"id":"RQ-05","merchant_id":"merchant_alpha","question":"How are prohibited and restricted business categories handled?","relevant":["POL-PROHIBITED-001"]}
+{"id":"RQ-06","merchant_id":"merchant_alpha","question":"Who owns the risk tiering policy and what are the tiers?","relevant":["POL-RISK-001"]}
+{"id":"RQ-07","merchant_id":"merchant_alpha","question":"What are my recent dispute and refund rates?","relevant":["ALPHA-TXN-001"]}
+{"id":"RQ-08","merchant_id":"merchant_alpha","question":"What type of business do I run and how long have I been trading?","relevant":["ALPHA-BUS-001"]}
+{"id":"RQ-09","merchant_id":"merchant_alpha","question":"What is the status of my KYC and business registration submission?","relevant":["ALPHA-KYC-001"]}
+{"id":"RQ-10","merchant_id":"merchant_alpha","question":"What risk tier have I asked to be placed in, and on what grounds?","relevant":["ALPHA-RISK-001"]}
+{"id":"RQ-11","merchant_id":"merchant_beta","question":"What is my business type and primary market?","relevant":["BETA-BUS-001"]}
+{"id":"RQ-12","merchant_id":"merchant_beta","question":"Have I submitted my beneficial owner information?","relevant":["BETA-KYC-001"]}
+{"id":"RQ-13","merchant_id":"merchant_beta","question":"What kind of onboarding review have I requested?","relevant":["BETA-RISK-001"]}
+{"id":"RQ-14","merchant_id":"merchant_gamma","question":"What does my business profile say about my operating history and market?","relevant":["GAMMA-BUS-001"]}

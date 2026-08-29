@@ -1,0 +1,1660 @@
+{
+  "tests": 14,
+  "repeat": 3,
+  "pipelines": {
+    "baseline": {
+      "mrr": {
+        "mean": 0.8691,
+        "min": 0.8452,
+        "max": 0.881,
+        "runs": [
+          0.881,
+          0.881,
+          0.8452
+        ]
+      },
+      "ndcg": {
+        "mean": 0.9049,
+        "min": 0.8815,
+        "max": 0.9166,
+        "runs": [
+          0.9166,
+          0.9166,
+          0.8815
+        ]
+      },
+      "hit_rate": {
+        "mean": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "runs": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "mean_latency_s": {
+        "mean": 2.6633,
+        "min": 2.59,
+        "max": 2.75,
+        "runs": [
+          2.75,
+          2.59,
+          2.65
+        ]
+      },
+      "sweeps": [
+        {
+          "pipeline": "baseline",
+          "mrr": 0.881,
+          "ndcg": 0.9166,
+          "hit_rate": 1.0,
+          "mean_latency_s": 2.75,
+          "results": [
+            {
+              "id": "RQ-01",
+              "merchant_id": "merchant_alpha",
+              "question": "What checks are required before a merchant can be onboarded?",
+              "relevant": [
+                "POL-ONBOARD-001"
+              ],
+              "retrieved": [
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001",
+                "BETA-KYC-001",
+                "ALPHA-KYC-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 3.71
+            },
+            {
+              "id": "RQ-02",
+              "merchant_id": "merchant_alpha",
+              "question": "What conditions must be met for a merchant to be considered low risk?",
+              "relevant": [
+                "POL-RISK-001"
+              ],
+              "retrieved": [
+                "POL-RISK-001",
+                "POL-RISK-001",
+                "ALPHA-RISK-001",
+                "GAMMA-BUS-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.73
+            },
+            {
+              "id": "RQ-03",
+              "merchant_id": "merchant_alpha",
+              "question": "When must a case be escalated to human review?",
+              "relevant": [
+                "POL-ESC-001"
+              ],
+              "retrieved": [
+                "POL-ESC-001",
+                "POL-RISK-001",
+                "POL-SETTLE-001",
+                "POL-ONBOARD-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.37
+            },
+            {
+              "id": "RQ-04",
+              "merchant_id": "merchant_alpha",
+              "question": "Can a merchant's own document authorize a settlement release?",
+              "relevant": [
+                "POL-SETTLE-001"
+              ],
+              "retrieved": [
+                "POL-SETTLE-001",
+                "POL-ONBOARD-001",
+                "GAMMA-BUS-001",
+                "BETA-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.55
+            },
+            {
+              "id": "RQ-05",
+              "merchant_id": "merchant_alpha",
+              "question": "How are prohibited and restricted business categories handled?",
+              "relevant": [
+                "POL-PROHIBITED-001"
+              ],
+              "retrieved": [
+                "POL-PROHIBITED-001",
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001",
+                "GAMMA-BUS-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.62
+            },
+            {
+              "id": "RQ-06",
+              "merchant_id": "merchant_alpha",
+              "question": "Who owns the risk tiering policy and what are the tiers?",
+              "relevant": [
+                "POL-RISK-001"
+              ],
+              "retrieved": [
+                "POL-RISK-001",
+                "POL-RISK-001",
+                "POL-RISK-001",
+                "POL-ESC-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.94
+            },
+            {
+              "id": "RQ-07",
+              "merchant_id": "merchant_alpha",
+              "question": "What are my recent dispute and refund rates?",
+              "relevant": [
+                "ALPHA-TXN-001"
+              ],
+              "retrieved": [
+                "ALPHA-TXN-001",
+                "ALPHA-RISK-001",
+                "BETA-RISK-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.7
+            },
+            {
+              "id": "RQ-08",
+              "merchant_id": "merchant_alpha",
+              "question": "What type of business do I run and how long have I been trading?",
+              "relevant": [
+                "ALPHA-BUS-001"
+              ],
+              "retrieved": [
+                "ALPHA-BUS-001",
+                "BETA-BUS-001",
+                "GAMMA-BUS-001",
+                "GAMMA-BUS-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 3.09
+            },
+            {
+              "id": "RQ-09",
+              "merchant_id": "merchant_alpha",
+              "question": "What is the status of my KYC and business registration submission?",
+              "relevant": [
+                "ALPHA-KYC-001"
+              ],
+              "retrieved": [
+                "BETA-KYC-001",
+                "ALPHA-KYC-001",
+                "GAMMA-KYC-001",
+                "GAMMA-BUS-001"
+              ],
+              "hit": true,
+              "mrr": 0.5,
+              "ndcg": 0.6309,
+              "latency_s": 2.56
+            },
+            {
+              "id": "RQ-10",
+              "merchant_id": "merchant_alpha",
+              "question": "What risk tier have I asked to be placed in, and on what grounds?",
+              "relevant": [
+                "ALPHA-RISK-001"
+              ],
+              "retrieved": [
+                "ALPHA-RISK-001",
+                "BETA-RISK-001",
+                "POL-RISK-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.56
+            },
+            {
+              "id": "RQ-11",
+              "merchant_id": "merchant_beta",
+              "question": "What is my business type and primary market?",
+              "relevant": [
+                "BETA-BUS-001"
+              ],
+              "retrieved": [
+                "ALPHA-BUS-001",
+                "BETA-BUS-001",
+                "GAMMA-BUS-001",
+                "GAMMA-BUS-001"
+              ],
+              "hit": true,
+              "mrr": 0.5,
+              "ndcg": 0.6309,
+              "latency_s": 2.67
+            },
+            {
+              "id": "RQ-12",
+              "merchant_id": "merchant_beta",
+              "question": "Have I submitted my beneficial owner information?",
+              "relevant": [
+                "BETA-KYC-001"
+              ],
+              "retrieved": [
+                "BETA-KYC-001",
+                "ALPHA-KYC-001",
+                "GAMMA-KYC-001",
+                "POL-ONBOARD-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.8
+            },
+            {
+              "id": "RQ-13",
+              "merchant_id": "merchant_beta",
+              "question": "What kind of onboarding review have I requested?",
+              "relevant": [
+                "BETA-RISK-001"
+              ],
+              "retrieved": [
+                "BETA-RISK-001",
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001",
+                "BETA-KYC-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.49
+            },
+            {
+              "id": "RQ-14",
+              "merchant_id": "merchant_gamma",
+              "question": "What does my business profile say about my operating history and market?",
+              "relevant": [
+                "GAMMA-BUS-001"
+              ],
+              "retrieved": [
+                "ALPHA-BUS-001",
+                "BETA-BUS-001",
+                "GAMMA-BUS-001",
+                "GAMMA-BUS-001"
+              ],
+              "hit": true,
+              "mrr": 0.3333,
+              "ndcg": 0.5706,
+              "latency_s": 2.7
+            }
+          ]
+        },
+        {
+          "pipeline": "baseline",
+          "mrr": 0.881,
+          "ndcg": 0.9166,
+          "hit_rate": 1.0,
+          "mean_latency_s": 2.59,
+          "results": [
+            {
+              "id": "RQ-01",
+              "merchant_id": "merchant_alpha",
+              "question": "What checks are required before a merchant can be onboarded?",
+              "relevant": [
+                "POL-ONBOARD-001"
+              ],
+              "retrieved": [
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001",
+                "BETA-KYC-001",
+                "ALPHA-KYC-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.55
+            },
+            {
+              "id": "RQ-02",
+              "merchant_id": "merchant_alpha",
+              "question": "What conditions must be met for a merchant to be considered low risk?",
+              "relevant": [
+                "POL-RISK-001"
+              ],
+              "retrieved": [
+                "POL-RISK-001",
+                "POL-RISK-001",
+                "ALPHA-RISK-001",
+                "GAMMA-BUS-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.7
+            },
+            {
+              "id": "RQ-03",
+              "merchant_id": "merchant_alpha",
+              "question": "When must a case be escalated to human review?",
+              "relevant": [
+                "POL-ESC-001"
+              ],
+              "retrieved": [
+                "POL-ESC-001",
+                "POL-RISK-001",
+                "POL-ONBOARD-001",
+                "POL-SETTLE-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.6
+            },
+            {
+              "id": "RQ-04",
+              "merchant_id": "merchant_alpha",
+              "question": "Can a merchant's own document authorize a settlement release?",
+              "relevant": [
+                "POL-SETTLE-001"
+              ],
+              "retrieved": [
+                "POL-SETTLE-001",
+                "POL-ONBOARD-001",
+                "GAMMA-BUS-001",
+                "BETA-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.63
+            },
+            {
+              "id": "RQ-05",
+              "merchant_id": "merchant_alpha",
+              "question": "How are prohibited and restricted business categories handled?",
+              "relevant": [
+                "POL-PROHIBITED-001"
+              ],
+              "retrieved": [
+                "POL-PROHIBITED-001",
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.71
+            },
+            {
+              "id": "RQ-06",
+              "merchant_id": "merchant_alpha",
+              "question": "Who owns the risk tiering policy and what are the tiers?",
+              "relevant": [
+                "POL-RISK-001"
+              ],
+              "retrieved": [
+                "POL-RISK-001",
+                "POL-RISK-001",
+                "POL-RISK-001",
+                "POL-ESC-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.63
+            },
+            {
+              "id": "RQ-07",
+              "merchant_id": "merchant_alpha",
+              "question": "What are my recent dispute and refund rates?",
+              "relevant": [
+                "ALPHA-TXN-001"
+              ],
+              "retrieved": [
+                "ALPHA-TXN-001",
+                "POL-RISK-001",
+                "ALPHA-RISK-001",
+                "POL-ESC-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.58
+            },
+            {
+              "id": "RQ-08",
+              "merchant_id": "merchant_alpha",
+              "question": "What type of business do I run and how long have I been trading?",
+              "relevant": [
+                "ALPHA-BUS-001"
+              ],
+              "retrieved": [
+                "ALPHA-BUS-001",
+                "BETA-BUS-001",
+                "GAMMA-BUS-001",
+                "GAMMA-BUS-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 1.97
+            },
+            {
+              "id": "RQ-09",
+              "merchant_id": "merchant_alpha",
+              "question": "What is the status of my KYC and business registration submission?",
+              "relevant": [
+                "ALPHA-KYC-001"
+              ],
+              "retrieved": [
+                "BETA-KYC-001",
+                "ALPHA-KYC-001",
+                "GAMMA-KYC-001",
+                "POL-ONBOARD-001"
+              ],
+              "hit": true,
+              "mrr": 0.5,
+              "ndcg": 0.6309,
+              "latency_s": 2.63
+            },
+            {
+              "id": "RQ-10",
+              "merchant_id": "merchant_alpha",
+              "question": "What risk tier have I asked to be placed in, and on what grounds?",
+              "relevant": [
+                "ALPHA-RISK-001"
+              ],
+              "retrieved": [
+                "ALPHA-RISK-001",
+                "BETA-RISK-001",
+                "POL-ESC-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.9
+            },
+            {
+              "id": "RQ-11",
+              "merchant_id": "merchant_beta",
+              "question": "What is my business type and primary market?",
+              "relevant": [
+                "BETA-BUS-001"
+              ],
+              "retrieved": [
+                "ALPHA-BUS-001",
+                "BETA-BUS-001",
+                "GAMMA-BUS-001",
+                "GAMMA-BUS-001"
+              ],
+              "hit": true,
+              "mrr": 0.5,
+              "ndcg": 0.6309,
+              "latency_s": 2.6
+            },
+            {
+              "id": "RQ-12",
+              "merchant_id": "merchant_beta",
+              "question": "Have I submitted my beneficial owner information?",
+              "relevant": [
+                "BETA-KYC-001"
+              ],
+              "retrieved": [
+                "BETA-KYC-001",
+                "ALPHA-KYC-001",
+                "GAMMA-KYC-001",
+                "POL-ONBOARD-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.59
+            },
+            {
+              "id": "RQ-13",
+              "merchant_id": "merchant_beta",
+              "question": "What kind of onboarding review have I requested?",
+              "relevant": [
+                "BETA-RISK-001"
+              ],
+              "retrieved": [
+                "BETA-RISK-001",
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001",
+                "BETA-KYC-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.61
+            },
+            {
+              "id": "RQ-14",
+              "merchant_id": "merchant_gamma",
+              "question": "What does my business profile say about my operating history and market?",
+              "relevant": [
+                "GAMMA-BUS-001"
+              ],
+              "retrieved": [
+                "ALPHA-BUS-001",
+                "BETA-BUS-001",
+                "GAMMA-BUS-001",
+                "GAMMA-BUS-001"
+              ],
+              "hit": true,
+              "mrr": 0.3333,
+              "ndcg": 0.5706,
+              "latency_s": 2.54
+            }
+          ]
+        },
+        {
+          "pipeline": "baseline",
+          "mrr": 0.8452,
+          "ndcg": 0.8815,
+          "hit_rate": 1.0,
+          "mean_latency_s": 2.65,
+          "results": [
+            {
+              "id": "RQ-01",
+              "merchant_id": "merchant_alpha",
+              "question": "What checks are required before a merchant can be onboarded?",
+              "relevant": [
+                "POL-ONBOARD-001"
+              ],
+              "retrieved": [
+                "POL-ONBOARD-001",
+                "BETA-KYC-001",
+                "ALPHA-KYC-001",
+                "POL-ONBOARD-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 0.8772,
+              "latency_s": 2.54
+            },
+            {
+              "id": "RQ-02",
+              "merchant_id": "merchant_alpha",
+              "question": "What conditions must be met for a merchant to be considered low risk?",
+              "relevant": [
+                "POL-RISK-001"
+              ],
+              "retrieved": [
+                "POL-RISK-001",
+                "POL-RISK-001",
+                "ALPHA-RISK-001",
+                "GAMMA-BUS-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.34
+            },
+            {
+              "id": "RQ-03",
+              "merchant_id": "merchant_alpha",
+              "question": "When must a case be escalated to human review?",
+              "relevant": [
+                "POL-ESC-001"
+              ],
+              "retrieved": [
+                "POL-ESC-001",
+                "POL-RISK-001",
+                "POL-ONBOARD-001",
+                "POL-SETTLE-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.94
+            },
+            {
+              "id": "RQ-04",
+              "merchant_id": "merchant_alpha",
+              "question": "Can a merchant's own document authorize a settlement release?",
+              "relevant": [
+                "POL-SETTLE-001"
+              ],
+              "retrieved": [
+                "POL-SETTLE-001",
+                "POL-ONBOARD-001",
+                "BETA-RISK-001",
+                "GAMMA-KYC-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.23
+            },
+            {
+              "id": "RQ-05",
+              "merchant_id": "merchant_alpha",
+              "question": "How are prohibited and restricted business categories handled?",
+              "relevant": [
+                "POL-PROHIBITED-001"
+              ],
+              "retrieved": [
+                "POL-PROHIBITED-001",
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.71
+            },
+            {
+              "id": "RQ-06",
+              "merchant_id": "merchant_alpha",
+              "question": "Who owns the risk tiering policy and what are the tiers?",
+              "relevant": [
+                "POL-RISK-001"
+              ],
+              "retrieved": [
+                "POL-RISK-001",
+                "POL-RISK-001",
+                "POL-RISK-001",
+                "POL-ESC-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.89
+            },
+            {
+              "id": "RQ-07",
+              "merchant_id": "merchant_alpha",
+              "question": "What are my recent dispute and refund rates?",
+              "relevant": [
+                "ALPHA-TXN-001"
+              ],
+              "retrieved": [
+                "ALPHA-TXN-001",
+                "ALPHA-RISK-001",
+                "POL-RISK-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.82
+            },
+            {
+              "id": "RQ-08",
+              "merchant_id": "merchant_alpha",
+              "question": "What type of business do I run and how long have I been trading?",
+              "relevant": [
+                "ALPHA-BUS-001"
+              ],
+              "retrieved": [
+                "ALPHA-BUS-001",
+                "BETA-BUS-001",
+                "GAMMA-BUS-001",
+                "GAMMA-BUS-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.86
+            },
+            {
+              "id": "RQ-09",
+              "merchant_id": "merchant_alpha",
+              "question": "What is the status of my KYC and business registration submission?",
+              "relevant": [
+                "ALPHA-KYC-001"
+              ],
+              "retrieved": [
+                "BETA-KYC-001",
+                "ALPHA-KYC-001",
+                "GAMMA-KYC-001",
+                "POL-ONBOARD-001"
+              ],
+              "hit": true,
+              "mrr": 0.5,
+              "ndcg": 0.6309,
+              "latency_s": 2.87
+            },
+            {
+              "id": "RQ-10",
+              "merchant_id": "merchant_alpha",
+              "question": "What risk tier have I asked to be placed in, and on what grounds?",
+              "relevant": [
+                "ALPHA-RISK-001"
+              ],
+              "retrieved": [
+                "BETA-RISK-001",
+                "ALPHA-RISK-001",
+                "POL-ESC-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 0.5,
+              "ndcg": 0.6309,
+              "latency_s": 2.63
+            },
+            {
+              "id": "RQ-11",
+              "merchant_id": "merchant_beta",
+              "question": "What is my business type and primary market?",
+              "relevant": [
+                "BETA-BUS-001"
+              ],
+              "retrieved": [
+                "ALPHA-BUS-001",
+                "BETA-BUS-001",
+                "GAMMA-BUS-001",
+                "GAMMA-BUS-001"
+              ],
+              "hit": true,
+              "mrr": 0.5,
+              "ndcg": 0.6309,
+              "latency_s": 3.07
+            },
+            {
+              "id": "RQ-12",
+              "merchant_id": "merchant_beta",
+              "question": "Have I submitted my beneficial owner information?",
+              "relevant": [
+                "BETA-KYC-001"
+              ],
+              "retrieved": [
+                "BETA-KYC-001",
+                "ALPHA-KYC-001",
+                "GAMMA-KYC-001",
+                "POL-ONBOARD-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.41
+            },
+            {
+              "id": "RQ-13",
+              "merchant_id": "merchant_beta",
+              "question": "What kind of onboarding review have I requested?",
+              "relevant": [
+                "BETA-RISK-001"
+              ],
+              "retrieved": [
+                "BETA-RISK-001",
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001",
+                "BETA-KYC-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.2
+            },
+            {
+              "id": "RQ-14",
+              "merchant_id": "merchant_gamma",
+              "question": "What does my business profile say about my operating history and market?",
+              "relevant": [
+                "GAMMA-BUS-001"
+              ],
+              "retrieved": [
+                "ALPHA-BUS-001",
+                "BETA-BUS-001",
+                "GAMMA-BUS-001",
+                "GAMMA-BUS-001"
+              ],
+              "hit": true,
+              "mrr": 0.3333,
+              "ndcg": 0.5706,
+              "latency_s": 2.59
+            }
+          ]
+        }
+      ]
+    },
+    "governed": {
+      "mrr": {
+        "mean": 0.9048,
+        "min": 0.9048,
+        "max": 0.9048,
+        "runs": [
+          0.9048,
+          0.9048,
+          0.9048
+        ]
+      },
+      "ndcg": {
+        "mean": 0.9206,
+        "min": 0.9175,
+        "max": 0.9239,
+        "runs": [
+          0.9175,
+          0.9239,
+          0.9205
+        ]
+      },
+      "hit_rate": {
+        "mean": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "runs": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "mean_latency_s": {
+        "mean": 3.07,
+        "min": 3.04,
+        "max": 3.11,
+        "runs": [
+          3.06,
+          3.04,
+          3.11
+        ]
+      },
+      "sweeps": [
+        {
+          "pipeline": "governed",
+          "mrr": 0.9048,
+          "ndcg": 0.9175,
+          "hit_rate": 1.0,
+          "mean_latency_s": 3.06,
+          "results": [
+            {
+              "id": "RQ-01",
+              "merchant_id": "merchant_alpha",
+              "question": "What checks are required before a merchant can be onboarded?",
+              "relevant": [
+                "POL-ONBOARD-001"
+              ],
+              "retrieved": [
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001",
+                "POL-PROHIBITED-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 3.07
+            },
+            {
+              "id": "RQ-02",
+              "merchant_id": "merchant_alpha",
+              "question": "What conditions must be met for a merchant to be considered low risk?",
+              "relevant": [
+                "POL-RISK-001"
+              ],
+              "retrieved": [
+                "POL-RISK-001",
+                "POL-RISK-001",
+                "POL-RISK-001",
+                "POL-ONBOARD-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 3.19
+            },
+            {
+              "id": "RQ-03",
+              "merchant_id": "merchant_alpha",
+              "question": "When must a case be escalated to human review?",
+              "relevant": [
+                "POL-ESC-001"
+              ],
+              "retrieved": [
+                "POL-ESC-001",
+                "POL-ONBOARD-001",
+                "POL-RISK-001",
+                "POL-SETTLE-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 3.27
+            },
+            {
+              "id": "RQ-04",
+              "merchant_id": "merchant_alpha",
+              "question": "Can a merchant's own document authorize a settlement release?",
+              "relevant": [
+                "POL-SETTLE-001"
+              ],
+              "retrieved": [
+                "POL-SETTLE-001",
+                "POL-ONBOARD-001",
+                "POL-RISK-001",
+                "POL-ONBOARD-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 3.73
+            },
+            {
+              "id": "RQ-05",
+              "merchant_id": "merchant_alpha",
+              "question": "How are prohibited and restricted business categories handled?",
+              "relevant": [
+                "POL-PROHIBITED-001"
+              ],
+              "retrieved": [
+                "POL-PROHIBITED-001",
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 3.68
+            },
+            {
+              "id": "RQ-06",
+              "merchant_id": "merchant_alpha",
+              "question": "Who owns the risk tiering policy and what are the tiers?",
+              "relevant": [
+                "POL-RISK-001"
+              ],
+              "retrieved": [
+                "POL-RISK-001",
+                "POL-RISK-001",
+                "POL-ESC-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 0.9675,
+              "latency_s": 3.37
+            },
+            {
+              "id": "RQ-07",
+              "merchant_id": "merchant_alpha",
+              "question": "What are my recent dispute and refund rates?",
+              "relevant": [
+                "ALPHA-TXN-001"
+              ],
+              "retrieved": [
+                "ALPHA-TXN-001",
+                "ALPHA-RISK-001",
+                "POL-RISK-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.81
+            },
+            {
+              "id": "RQ-08",
+              "merchant_id": "merchant_alpha",
+              "question": "What type of business do I run and how long have I been trading?",
+              "relevant": [
+                "ALPHA-BUS-001"
+              ],
+              "retrieved": [
+                "ALPHA-BUS-001",
+                "ALPHA-KYC-001",
+                "ALPHA-RISK-001",
+                "POL-PROHIBITED-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.81
+            },
+            {
+              "id": "RQ-09",
+              "merchant_id": "merchant_alpha",
+              "question": "What is the status of my KYC and business registration submission?",
+              "relevant": [
+                "ALPHA-KYC-001"
+              ],
+              "retrieved": [
+                "ALPHA-KYC-001",
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001",
+                "POL-PROHIBITED-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.3
+            },
+            {
+              "id": "RQ-10",
+              "merchant_id": "merchant_alpha",
+              "question": "What risk tier have I asked to be placed in, and on what grounds?",
+              "relevant": [
+                "ALPHA-RISK-001"
+              ],
+              "retrieved": [
+                "POL-RISK-001",
+                "POL-RISK-001",
+                "ALPHA-RISK-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 0.3333,
+              "ndcg": 0.5,
+              "latency_s": 3.2
+            },
+            {
+              "id": "RQ-11",
+              "merchant_id": "merchant_beta",
+              "question": "What is my business type and primary market?",
+              "relevant": [
+                "BETA-BUS-001"
+              ],
+              "retrieved": [
+                "BETA-BUS-001",
+                "BETA-KYC-001",
+                "BETA-RISK-001",
+                "POL-ONBOARD-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.31
+            },
+            {
+              "id": "RQ-12",
+              "merchant_id": "merchant_beta",
+              "question": "Have I submitted my beneficial owner information?",
+              "relevant": [
+                "BETA-KYC-001"
+              ],
+              "retrieved": [
+                "BETA-KYC-001",
+                "POL-ONBOARD-001",
+                "BETA-RISK-001",
+                "POL-ONBOARD-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.71
+            },
+            {
+              "id": "RQ-13",
+              "merchant_id": "merchant_beta",
+              "question": "What kind of onboarding review have I requested?",
+              "relevant": [
+                "BETA-RISK-001"
+              ],
+              "retrieved": [
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001",
+                "BETA-RISK-001",
+                "BETA-KYC-001"
+              ],
+              "hit": true,
+              "mrr": 0.3333,
+              "ndcg": 0.5,
+              "latency_s": 3.43
+            },
+            {
+              "id": "RQ-14",
+              "merchant_id": "merchant_gamma",
+              "question": "What does my business profile say about my operating history and market?",
+              "relevant": [
+                "GAMMA-BUS-001"
+              ],
+              "retrieved": [
+                "GAMMA-BUS-001",
+                "GAMMA-KYC-001",
+                "GAMMA-WEB-001",
+                "GAMMA-BUS-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 0.8772,
+              "latency_s": 2.97
+            }
+          ]
+        },
+        {
+          "pipeline": "governed",
+          "mrr": 0.9048,
+          "ndcg": 0.9239,
+          "hit_rate": 1.0,
+          "mean_latency_s": 3.04,
+          "results": [
+            {
+              "id": "RQ-01",
+              "merchant_id": "merchant_alpha",
+              "question": "What checks are required before a merchant can be onboarded?",
+              "relevant": [
+                "POL-ONBOARD-001"
+              ],
+              "retrieved": [
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001",
+                "POL-PROHIBITED-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 3.24
+            },
+            {
+              "id": "RQ-02",
+              "merchant_id": "merchant_alpha",
+              "question": "What conditions must be met for a merchant to be considered low risk?",
+              "relevant": [
+                "POL-RISK-001"
+              ],
+              "retrieved": [
+                "POL-RISK-001",
+                "POL-RISK-001",
+                "POL-ONBOARD-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 0.9675,
+              "latency_s": 3.47
+            },
+            {
+              "id": "RQ-03",
+              "merchant_id": "merchant_alpha",
+              "question": "When must a case be escalated to human review?",
+              "relevant": [
+                "POL-ESC-001"
+              ],
+              "retrieved": [
+                "POL-ESC-001",
+                "POL-ONBOARD-001",
+                "POL-RISK-001",
+                "POL-SETTLE-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 3.01
+            },
+            {
+              "id": "RQ-04",
+              "merchant_id": "merchant_alpha",
+              "question": "Can a merchant's own document authorize a settlement release?",
+              "relevant": [
+                "POL-SETTLE-001"
+              ],
+              "retrieved": [
+                "POL-SETTLE-001",
+                "POL-ONBOARD-001",
+                "POL-RISK-001",
+                "POL-ONBOARD-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 3.5
+            },
+            {
+              "id": "RQ-05",
+              "merchant_id": "merchant_alpha",
+              "question": "How are prohibited and restricted business categories handled?",
+              "relevant": [
+                "POL-PROHIBITED-001"
+              ],
+              "retrieved": [
+                "POL-PROHIBITED-001",
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 3.82
+            },
+            {
+              "id": "RQ-06",
+              "merchant_id": "merchant_alpha",
+              "question": "Who owns the risk tiering policy and what are the tiers?",
+              "relevant": [
+                "POL-RISK-001"
+              ],
+              "retrieved": [
+                "POL-RISK-001",
+                "POL-RISK-001",
+                "POL-ESC-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 0.9675,
+              "latency_s": 3.48
+            },
+            {
+              "id": "RQ-07",
+              "merchant_id": "merchant_alpha",
+              "question": "What are my recent dispute and refund rates?",
+              "relevant": [
+                "ALPHA-TXN-001"
+              ],
+              "retrieved": [
+                "ALPHA-TXN-001",
+                "POL-RISK-001",
+                "POL-RISK-001",
+                "ALPHA-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.25
+            },
+            {
+              "id": "RQ-08",
+              "merchant_id": "merchant_alpha",
+              "question": "What type of business do I run and how long have I been trading?",
+              "relevant": [
+                "ALPHA-BUS-001"
+              ],
+              "retrieved": [
+                "ALPHA-BUS-001",
+                "ALPHA-KYC-001",
+                "ALPHA-RISK-001",
+                "POL-PROHIBITED-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.47
+            },
+            {
+              "id": "RQ-09",
+              "merchant_id": "merchant_alpha",
+              "question": "What is the status of my KYC and business registration submission?",
+              "relevant": [
+                "ALPHA-KYC-001"
+              ],
+              "retrieved": [
+                "ALPHA-KYC-001",
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.28
+            },
+            {
+              "id": "RQ-10",
+              "merchant_id": "merchant_alpha",
+              "question": "What risk tier have I asked to be placed in, and on what grounds?",
+              "relevant": [
+                "ALPHA-RISK-001"
+              ],
+              "retrieved": [
+                "POL-RISK-001",
+                "POL-RISK-001",
+                "ALPHA-RISK-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 0.3333,
+              "ndcg": 0.5,
+              "latency_s": 3.41
+            },
+            {
+              "id": "RQ-11",
+              "merchant_id": "merchant_beta",
+              "question": "What is my business type and primary market?",
+              "relevant": [
+                "BETA-BUS-001"
+              ],
+              "retrieved": [
+                "BETA-BUS-001",
+                "BETA-KYC-001",
+                "BETA-RISK-001",
+                "POL-ONBOARD-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.66
+            },
+            {
+              "id": "RQ-12",
+              "merchant_id": "merchant_beta",
+              "question": "Have I submitted my beneficial owner information?",
+              "relevant": [
+                "BETA-KYC-001"
+              ],
+              "retrieved": [
+                "BETA-KYC-001",
+                "BETA-RISK-001",
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.58
+            },
+            {
+              "id": "RQ-13",
+              "merchant_id": "merchant_beta",
+              "question": "What kind of onboarding review have I requested?",
+              "relevant": [
+                "BETA-RISK-001"
+              ],
+              "retrieved": [
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001",
+                "BETA-RISK-001",
+                "BETA-KYC-001"
+              ],
+              "hit": true,
+              "mrr": 0.3333,
+              "ndcg": 0.5,
+              "latency_s": 3.39
+            },
+            {
+              "id": "RQ-14",
+              "merchant_id": "merchant_gamma",
+              "question": "What does my business profile say about my operating history and market?",
+              "relevant": [
+                "GAMMA-BUS-001"
+              ],
+              "retrieved": [
+                "GAMMA-BUS-001",
+                "GAMMA-KYC-001",
+                "GAMMA-WEB-001",
+                "POL-PROHIBITED-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 3.05
+            }
+          ]
+        },
+        {
+          "pipeline": "governed",
+          "mrr": 0.9048,
+          "ndcg": 0.9205,
+          "hit_rate": 1.0,
+          "mean_latency_s": 3.11,
+          "results": [
+            {
+              "id": "RQ-01",
+              "merchant_id": "merchant_alpha",
+              "question": "What checks are required before a merchant can be onboarded?",
+              "relevant": [
+                "POL-ONBOARD-001"
+              ],
+              "retrieved": [
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001",
+                "POL-PROHIBITED-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 3.2
+            },
+            {
+              "id": "RQ-02",
+              "merchant_id": "merchant_alpha",
+              "question": "What conditions must be met for a merchant to be considered low risk?",
+              "relevant": [
+                "POL-RISK-001"
+              ],
+              "retrieved": [
+                "POL-RISK-001",
+                "POL-RISK-001",
+                "POL-ONBOARD-001",
+                "ALPHA-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 3.46
+            },
+            {
+              "id": "RQ-03",
+              "merchant_id": "merchant_alpha",
+              "question": "When must a case be escalated to human review?",
+              "relevant": [
+                "POL-ESC-001"
+              ],
+              "retrieved": [
+                "POL-ESC-001",
+                "POL-ONBOARD-001",
+                "POL-RISK-001",
+                "POL-SETTLE-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 3.39
+            },
+            {
+              "id": "RQ-04",
+              "merchant_id": "merchant_alpha",
+              "question": "Can a merchant's own document authorize a settlement release?",
+              "relevant": [
+                "POL-SETTLE-001"
+              ],
+              "retrieved": [
+                "POL-SETTLE-001",
+                "POL-ONBOARD-001",
+                "POL-RISK-001",
+                "POL-ONBOARD-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 3.53
+            },
+            {
+              "id": "RQ-05",
+              "merchant_id": "merchant_alpha",
+              "question": "How are prohibited and restricted business categories handled?",
+              "relevant": [
+                "POL-PROHIBITED-001"
+              ],
+              "retrieved": [
+                "POL-PROHIBITED-001",
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 3.13
+            },
+            {
+              "id": "RQ-06",
+              "merchant_id": "merchant_alpha",
+              "question": "Who owns the risk tiering policy and what are the tiers?",
+              "relevant": [
+                "POL-RISK-001"
+              ],
+              "retrieved": [
+                "POL-RISK-001",
+                "POL-RISK-001",
+                "POL-ESC-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 0.9675,
+              "latency_s": 3.58
+            },
+            {
+              "id": "RQ-07",
+              "merchant_id": "merchant_alpha",
+              "question": "What are my recent dispute and refund rates?",
+              "relevant": [
+                "ALPHA-TXN-001"
+              ],
+              "retrieved": [
+                "ALPHA-TXN-001",
+                "ALPHA-RISK-001",
+                "POL-RISK-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.76
+            },
+            {
+              "id": "RQ-08",
+              "merchant_id": "merchant_alpha",
+              "question": "What type of business do I run and how long have I been trading?",
+              "relevant": [
+                "ALPHA-BUS-001"
+              ],
+              "retrieved": [
+                "ALPHA-BUS-001",
+                "ALPHA-KYC-001",
+                "ALPHA-RISK-001",
+                "POL-PROHIBITED-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.78
+            },
+            {
+              "id": "RQ-09",
+              "merchant_id": "merchant_alpha",
+              "question": "What is the status of my KYC and business registration submission?",
+              "relevant": [
+                "ALPHA-KYC-001"
+              ],
+              "retrieved": [
+                "ALPHA-KYC-001",
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001",
+                "POL-PROHIBITED-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.64
+            },
+            {
+              "id": "RQ-10",
+              "merchant_id": "merchant_alpha",
+              "question": "What risk tier have I asked to be placed in, and on what grounds?",
+              "relevant": [
+                "ALPHA-RISK-001"
+              ],
+              "retrieved": [
+                "POL-RISK-001",
+                "POL-RISK-001",
+                "ALPHA-RISK-001",
+                "POL-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 0.3333,
+              "ndcg": 0.5,
+              "latency_s": 3.58
+            },
+            {
+              "id": "RQ-11",
+              "merchant_id": "merchant_beta",
+              "question": "What is my business type and primary market?",
+              "relevant": [
+                "BETA-BUS-001"
+              ],
+              "retrieved": [
+                "BETA-BUS-001",
+                "BETA-KYC-001",
+                "BETA-RISK-001",
+                "POL-ONBOARD-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.71
+            },
+            {
+              "id": "RQ-12",
+              "merchant_id": "merchant_beta",
+              "question": "Have I submitted my beneficial owner information?",
+              "relevant": [
+                "BETA-KYC-001"
+              ],
+              "retrieved": [
+                "BETA-KYC-001",
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001",
+                "BETA-RISK-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 1.0,
+              "latency_s": 2.66
+            },
+            {
+              "id": "RQ-13",
+              "merchant_id": "merchant_beta",
+              "question": "What kind of onboarding review have I requested?",
+              "relevant": [
+                "BETA-RISK-001"
+              ],
+              "retrieved": [
+                "POL-ONBOARD-001",
+                "POL-ONBOARD-001",
+                "BETA-RISK-001",
+                "BETA-KYC-001"
+              ],
+              "hit": true,
+              "mrr": 0.3333,
+              "ndcg": 0.5,
+              "latency_s": 3.15
+            },
+            {
+              "id": "RQ-14",
+              "merchant_id": "merchant_gamma",
+              "question": "What does my business profile say about my operating history and market?",
+              "relevant": [
+                "GAMMA-BUS-001"
+              ],
+              "retrieved": [
+                "GAMMA-BUS-001",
+                "GAMMA-KYC-001",
+                "GAMMA-BUS-001",
+                "POL-PROHIBITED-001"
+              ],
+              "hit": true,
+              "mrr": 1.0,
+              "ndcg": 0.9197,
+              "latency_s": 2.94
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
