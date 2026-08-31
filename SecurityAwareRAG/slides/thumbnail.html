@@ -1,0 +1,39 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Thumbnail</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{--bg:#07090e;--hi:#fff;--dim:#8b95a6;--red:#ff3355;--amber:#ffb020;
+  --d:"Archivo",sans-serif;--m:"IBM Plex Mono",monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#000;height:100%;overflow:hidden}
+#t{position:absolute;top:50%;left:50%;width:1280px;height:720px;transform-origin:center;
+  background:radial-gradient(760px 520px at 88% 50%, rgba(255,51,85,.20), transparent 65%),
+             radial-gradient(600px 400px at 0% 0%, rgba(255,176,32,.10), transparent 60%),
+             var(--bg);
+  padding:56px 64px;display:flex;flex-direction:column;font-family:var(--d)}
+.top{display:flex;align-items:center;gap:14px}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--red);
+  box-shadow:0 0 20px 5px rgba(255,51,85,.75)}
+.brand{font-size:26px;font-weight:800;letter-spacing:.14em;color:var(--hi)}
+.mid{margin:auto 0;display:flex;flex-direction:column;gap:6px}
+.call{font-family:var(--m);font-size:52px;font-weight:600;color:var(--amber);letter-spacing:-.02em}
+.call .ar{color:#4a5464;margin-right:20px}
+.blocked{display:flex;align-items:center;gap:26px;margin-top:4px}
+.blocked .ar{font-family:var(--m);font-size:52px;color:#4a5464}
+.big{font-size:172px;font-weight:900;letter-spacing:-.05em;line-height:.86;color:var(--red);
+  text-shadow:0 0 70px rgba(255,51,85,.45)}
+.by{font-size:31px;font-weight:700;color:var(--hi);margin-top:24px;letter-spacing:-.02em}
+.by span{color:var(--dim);font-weight:600}
+.foot{font-family:var(--m);font-size:19px;color:#5a6474;letter-spacing:.04em}
+</style></head><body>
+<div id="t">
+  <div class="top"><span class="dot"></span><span class="brand">SECURITYAWARERAG</span></div>
+  <div class="mid">
+    <div class="call"><span class="ar">agent →</span>approve_onboarding()</div>
+    <div class="blocked"><span class="ar">code &nbsp;→</span><span class="big">BLOCKED</span></div>
+    <div class="by">The AI said yes. <span>The system said no.</span></div>
+  </div>
+  <div class="foot">Razorpay AI Buildathon 2026 · AI Risk Manager</div>
+</div>
+<script>const f=()=>{const s=Math.min(innerWidth/1280,innerHeight/720);
+document.getElementById('t').style.transform=`translate(-50%,-50%) scale(${s})`};
+addEventListener('resize',f);f();</script></body></html>
