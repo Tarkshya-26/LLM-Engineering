@@ -1,0 +1,38 @@
+[
+  {
+    "id": "q1",
+    "query": "ANX-14 RAM specification",
+    "intent_type": "exact_match",
+    "what_to_observe": "Exact model code (ANX-14) should make keyword retrieval precise."
+  },
+  {
+    "id": "q2",
+    "query": "my computer powers off soon after I disconnect the charger",
+    "intent_type": "paraphrase",
+    "what_to_observe": "No shared keywords with the battery article, so dense retrieval should win."
+  },
+  {
+    "id": "q3",
+    "query": "I'm locked out and forgot my login credentials",
+    "intent_type": "paraphrase",
+    "what_to_observe": "Semantic match to the password reset guide despite different wording."
+  },
+  {
+    "id": "q4",
+    "query": "GDPR compliance",
+    "intent_type": "exact_match",
+    "what_to_observe": "Exact regulatory term; keyword retrieval should be precise."
+  },
+  {
+    "id": "q5",
+    "query": "RX-450 keeps buffering and dropping the connection",
+    "intent_type": "mixed_intent",
+    "what_to_observe": "Needs the exact code (RX-450) AND a semantic match (buffering/connection). Hybrid should surface both the firmware and connectivity articles."
+  },
+  {
+    "id": "q6",
+    "query": "what should I do with an old gadget I no longer want",
+    "intent_type": "paraphrase",
+    "what_to_observe": "Semantic match to the recycling and trade-in article."
+  }
+]
