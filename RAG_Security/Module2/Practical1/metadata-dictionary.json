@@ -1,0 +1,25 @@
+[
+  { "field": "vector_id",          "type": "str",            "classification": "stored-only",    "filter_role": "none",      "purpose": "Unique id for the embedded chunk" },
+  { "field": "embedding",          "type": "list[float]",    "classification": "stored-only",    "filter_role": "none",      "purpose": "The vector itself; never filtered or displayed" },
+  { "field": "embedding_model",    "type": "str",            "classification": "stored-only",    "filter_role": "none",      "purpose": "Model + version used to embed (reproducibility)" },
+  { "field": "text",               "type": "str",            "classification": "displayable",    "filter_role": "none",      "purpose": "Chunk text shown to the user as the result" },
+  { "field": "source_document_id", "type": "str",            "classification": "stored-only",    "filter_role": "none",      "purpose": "Links the vector back to its source document" },
+  { "field": "chunk_id",           "type": "str",            "classification": "stored-only",    "filter_role": "none",      "purpose": "Identifies the chunk within the source document" },
+  { "field": "source_uri",         "type": "str",            "classification": "displayable",    "filter_role": "none",      "purpose": "Where the source lives; shown as a citation" },
+  { "field": "content_version",    "type": "str",            "classification": "audit-oriented", "filter_role": "none",      "purpose": "Version of the source content for consistency checks" },
+  { "field": "content_type",       "type": "str",            "classification": "filterable",     "filter_role": "relevance", "purpose": "Filter results by document type" },
+  { "field": "topic",              "type": "str",            "classification": "filterable",     "filter_role": "relevance", "purpose": "Filter results by subject" },
+  { "field": "product",            "type": "str | None",     "classification": "filterable",     "filter_role": "relevance", "purpose": "Filter results by product" },
+  { "field": "region",             "type": "str",            "classification": "filterable",     "filter_role": "relevance", "purpose": "Filter results by region (also supports data residency)" },
+  { "field": "language",           "type": "str",            "classification": "filterable",     "filter_role": "relevance", "purpose": "Filter results by language" },
+
+  { "field": "tenant_id",          "type": "str",            "classification": "filterable",     "filter_role": "governance",      "purpose": "Isolates one tenant's data from another's" },
+  { "field": "access_group",       "type": "str",            "classification": "filterable",     "filter_role": "governance",      "purpose": "Restricts retrieval to permitted roles" },
+  { "field": "sensitivity_label",  "type": "str",            "classification": "filterable",     "filter_role": "governance",      "purpose": "Excludes content above a caller's clearance" },
+  { "field": "source_owner",       "type": "str",            "classification": "audit-oriented", "filter_role": "none",      "purpose": "Records accountability for the source; not used to filter" },
+
+  { "field": "created_at",         "type": "datetime",       "classification": "audit-oriented", "filter_role": "none",      "purpose": "When the vector was created" },
+  { "field": "last_validated_at",  "type": "datetime | None","classification": "audit-oriented", "filter_role": "none",      "purpose": "Last source-to-index consistency check" },
+  { "field": "deleted_at",         "type": "datetime | None","classification": "audit-oriented", "filter_role": "none",      "purpose": "Soft-delete marker for governance" },
+  { "field": "eval_split",         "type": "str | None",     "classification": "stored-only",    "filter_role": "none",      "purpose": "Marks evaluation/test records" }
+]
