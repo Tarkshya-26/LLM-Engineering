@@ -1,0 +1,56 @@
+[
+  {
+    "source_document_id": "doc-003",
+    "title": "AeroBook Pro X14 Technical Specifications",
+    "body": "The AeroBook Pro X14 laptop, model ANX-14, ships with 16 GB of RAM and a 512 GB solid-state drive.",
+    "content_type": "spec",
+    "region": "global",
+    "owner": "hardware-docs-team",
+    "current_version": "v3"
+  },
+  {
+    "source_document_id": "doc-004",
+    "title": "AeroBook Pro X14 Battery Troubleshooting",
+    "body": "If your AeroBook Pro X14 battery drains quickly or will not hold a charge, recalibrate it.",
+    "content_type": "troubleshooting",
+    "region": "global",
+    "owner": "support-content-team",
+    "current_version": "v1"
+  },
+  {
+    "source_document_id": "doc-006",
+    "title": "Resetting Your Password",
+    "body": "To restore access to your TechNova account, open the security page and choose Reset Password.",
+    "content_type": "how_to",
+    "region": "global",
+    "owner": "identity-team",
+    "current_version": "v2"
+  },
+  {
+    "source_document_id": "doc-008",
+    "title": "Data Privacy and GDPR Compliance",
+    "body": "TechNova processes personal data in accordance with GDPR and other applicable privacy regulations.",
+    "content_type": "legal",
+    "region": "EU",
+    "owner": "legal-compliance-team",
+    "current_version": "v4"
+  },
+  {
+    "source_document_id": "doc-011",
+    "title": "SmartHub RX-450 Firmware Update",
+    "body": "Firmware version 2.3 for the SmartHub RX-450 router improves connection stability and security.",
+    "content_type": "spec",
+    "region": "global",
+    "owner": "networking-docs-team",
+    "current_version": "v2"
+  },
+  {
+    "source_document_id": "doc-012",
+    "title": "SmartHub Slow Wireless Troubleshooting",
+    "body": "If video streams keep buffering or the wireless signal feels weak, move the SmartHub closer to your devices.",
+    "content_type": "troubleshooting",
+    "region": "global",
+    "owner": "support-content-team",
+    "current_version": "v1"
+  }
+]
