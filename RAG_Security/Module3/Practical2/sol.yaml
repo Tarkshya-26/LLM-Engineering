@@ -1,0 +1,47 @@
+workload_assumptions:
+  corpus_size: 5000000
+  growth_rate: "~15% per quarter"
+  query_type: "natural-language support questions plus exact product codes"
+  latency_target_ms: 150
+  freshness: "re-embed within 24h of a source change"
+  recall_target: 0.90
+
+candidate_options:
+  - name: "Exact (FlatIP)"
+    pros: "perfect recall; simple to operate"
+    cons: "scans the whole corpus; will not meet the latency target at 5M vectors"
+  - name: "IVF (approximate)"
+    pros: "scans only a few partitions; meets latency at scale"
+    cons: "recall depends on nprobe and must be tuned and monitored"
+
+recommendation:
+  choice: "IVF (approximate)"
+  nprobe: 8
+  justification: "benchmark evidence shows nprobe=8 reaches recall@10 of 0.998 at ~6% scan, meeting the 0.90 recall target within the 25% scan budget"
+
+tenant_isolation:
+  approach: "enforce a tenant_id metadata pre-filter on every query, with a separate IVF index per large tenant"
+
+scaling_plan: "Partition by tenant and revisit PQ compression if memory becomes tight as the corpus grows; shard once a single index exceeds host memory."
+
+risk_checklist:
+  recall: "monitor recall@10 against the benchmark baseline"
+  latency: "tune nprobe and watch p95 latency"
+  memory: "IVF lists fit in RAM at the current size; revisit PQ if memory-bound"
+  cost: "approximate search lowers compute per query"
+  index_rebuilds: "schedule periodic rebuilds and keep a rollback copy"
+  filtering: "apply relevance and governance filters as metadata pre-filters"
+  tenant_isolation: "pre-filter by tenant_id; never rely on ranking for separation"
+  growth: "re-benchmark when the corpus doubles"
+
+tradeoff_summary: "Exact gives perfect recall but high latency at scale; IVF trades a little recall for far lower latency and cost."
+
+monitoring_signals:
+  - "recall drift vs benchmark"
+  - "p95 query latency"
+  - "query throughput"
+  - "index coverage / orphaned vectors"
+
+source_ids_preserved: true
+
+validation_plan: "Re-run the exact-vs-approximate benchmark on production-scale data and confirm recall@10 meets the target before rollout."

@@ -1,3 +1,12 @@
+## Whole lab in short grisp :
+
+# We are basically evaluating how much our ANN Network retrieved the valid chunks against
+# All the chunks 3/5 known as Recall@k
+
+
+
+
+
 # benchmark-lab.py
 # Benchmark EXACT vs APPROXIMATE (ANN) vector retrieval on a reproducible synthetic dataset.
 # Measure recall@k and search cost, emit a comparison matrix and benchmark_report.json, and
@@ -40,7 +49,7 @@ def recall_at_k(approx_ids, exact_ids, k):
     #       and `exact_ids` is the ground truth. Return a float between 0.0 and 1.0.
     #       Hint: set intersection makes this a one-liner.
     ...
-    
+    return len(set(approx_ids)) & set(exact_ids) / k
 
 
 def search_all(index, queries, k):

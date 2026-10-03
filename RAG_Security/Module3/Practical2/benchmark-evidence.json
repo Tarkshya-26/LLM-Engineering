@@ -1,0 +1,9 @@
+{
+  "_comment": "Benchmark evidence carried over from Lab AL1 (Benchmark Exact vs Approximate Retrieval). Read-only; the audit cross-checks the recommendation against these numbers.",
+  "dataset": { "n_vectors": 50000, "dim": 64, "nlist": 128, "k": 10, "seed": 42 },
+  "recall_target": 0.90,
+  "max_scan_fraction_budget": 0.25,
+  "exact_recall_at_k": 1.0,
+  "recall_at_k_by_nprobe": { "1": 0.549, "2": 0.813, "4": 0.969, "8": 0.998, "16": 0.999 },
+  "scan_fraction_by_nprobe": { "1": 0.008, "2": 0.016, "4": 0.031, "8": 0.063, "16": 0.125 }
+}

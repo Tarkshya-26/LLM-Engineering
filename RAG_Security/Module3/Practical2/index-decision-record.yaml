@@ -1,0 +1,47 @@
+# Index Strategy and Scaling Tradeoff Memo - Index Decision Record (DRAFT)
+#
+# This draft was submitted for an index design review. The automated audit
+# (audit-decision-record.py) flagged several issues. Fix them so the audit passes.
+# Benchmark numbers come from Lab AL1 and are recorded in benchmark-evidence.json.
+
+workload_assumptions:
+  corpus_size: 5000000
+  growth_rate: "~15% per quarter"
+  query_type: "natural-language support questions plus exact product codes"
+  latency_target_ms: 150
+  freshness: "re-embed within 24h of a source change"
+  recall_target: 0.90
+
+candidate_options:
+  - name: "IVF (approximate)"
+    pros: "scans only a few partitions; scales to millions of vectors"
+    cons: "recall depends on nprobe and must be tuned"
+
+recommendation:
+  choice: "IVF (approximate)"
+  nprobe: 1
+  justification: "approximate search is always better than exact search"
+
+tenant_isolation:
+  approach: "rely on relevance ranking to keep each tenant's results separate"
+
+scaling_plan: "Partition the index by tenant and revisit PQ compression if memory becomes tight as the corpus grows."
+
+risk_checklist:
+  recall: "monitor recall@10 against the benchmark baseline"
+  latency: "tune nprobe and watch p95 latency"
+  memory: "IVF lists fit in RAM at the current size"
+  cost: "approximate search lowers compute per query"
+  filtering: "apply relevance and governance filters as metadata pre-filters"
+  growth: "re-benchmark when the corpus doubles"
+
+tradeoff_summary: "Exact gives perfect recall but scans everything; IVF trades a little recall for far lower latency and cost."
+
+monitoring_signals:
+  - "recall drift vs benchmark"
+  - "p95 query latency"
+  - "query throughput"
+
+source_ids_preserved: false
+
+validation_plan: "Re-run the exact-vs-approximate benchmark on production-scale data and confirm recall@10 meets the target before rollout."
