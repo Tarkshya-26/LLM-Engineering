@@ -128,6 +128,7 @@ def operational_filter(records, source_versions):
     #        source document, i.e. source_versions[record["source_document_id"]].
     #   source_versions is a dict mapping source_document_id -> current_version.
     ...
+    return [r for r in records if r.get("deleted_at") is None and r["content_version"] == source_versions.get(r["source_document_id"])]
 
 
 def check_operational_filter(records, source_versions):
