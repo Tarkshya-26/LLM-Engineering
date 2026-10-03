@@ -1,0 +1,18 @@
+{
+  "_comment": "Reproducible benchmark configuration. Change 'nprobe' to tune the approximate index.",
+  "seed": 42,
+  "n_vectors": 50000,
+  "dim": 64,
+  "n_clusters": 40,
+  "spread": 0.9,
+  "n_queries": 200,
+  "k": 10,
+  "index": {
+    "nlist": 128,
+    "nprobe": 1
+  },
+  "acceptance": {
+    "min_recall_at_k": 0.9,
+    "max_scan_fraction": 0.25
+  }
+}
