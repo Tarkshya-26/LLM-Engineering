@@ -1,0 +1,7 @@
+[
+  { "source_id": "doc-101", "body": "Return policy: full refund within 30 days.", "content_version": "v1", "access_group": "public", "deleted": false },
+  { "source_id": "doc-102", "body": "Battery guide UPDATED: recalibrate then recharge fully.", "content_version": "v2", "access_group": "public", "deleted": false },
+  { "source_id": "doc-103", "body": "Password reset: open the security page and choose Reset.", "content_version": "v1", "access_group": "internal", "deleted": false },
+  { "source_id": "doc-104", "body": "New shipping FAQ: standard delivery is 3-5 business days.", "content_version": "v1", "access_group": "public", "deleted": false },
+  { "source_id": "doc-105", "body": "Expired promotion page scheduled for removal.", "content_version": "v1", "access_group": "public", "deleted": true }
+]

@@ -1,0 +1,14 @@
+{
+  "_comment": "Alerting policy: how many violations of each check are tolerated before an alert fires. PAGE = wake someone now (governance/security); WARN = quality issue. NOTE: one governance-critical check is missing from this policy.",
+  "orphaned_vectors":         { "max": 0, "severity": "PAGE" },
+  "metadata_mismatches":      { "max": 0, "severity": "PAGE" },
+  "missing_vectors":          { "max": 0, "severity": "WARN" },
+  "model_version_mismatches": { "max": 0, "severity": "WARN" },
+  "duplicate_vectors":        { "max": 0, "severity": "WARN" },
+  
+  "undeleted_records": { "max": 0, "severity": "PAGE" }
+
+  
+}
+
+

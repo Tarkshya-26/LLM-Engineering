@@ -1,0 +1,7 @@
+[
+  { "vector_id": "vec-doc-101", "source_id": "doc-101", "content_version": "v1", "access_group": "public", "embedding": [0.21, 0.44, 0.13, 0.78], "status": "active" },
+  { "vector_id": "vec-doc-102", "source_id": "doc-102", "content_version": "v1", "access_group": "public", "embedding": [0.55, 0.10, 0.62, 0.34], "status": "active" },
+  { "vector_id": "vec-doc-103", "source_id": "doc-103", "content_version": "v1", "access_group": "public", "embedding": [0.30, 0.71, 0.05, 0.49], "status": "active" },
+  { "vector_id": "vec-doc-105", "source_id": "doc-105", "content_version": "v1", "access_group": "public", "embedding": [0.88, 0.23, 0.41, 0.17], "status": "active" },
+  { "vector_id": "vec-doc-106", "source_id": "doc-106", "content_version": "v1", "access_group": "public", "embedding": [0.12, 0.90, 0.36, 0.05], "status": "active" }
+]
