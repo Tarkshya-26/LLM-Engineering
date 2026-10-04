@@ -1,0 +1,6 @@
+{
+  "_comment": "Alert policy: each panel fires when its value exceeds max. PAGE = wake on-call; WARN = quality signal.",
+  "p95_latency_ms":    { "max": 300,  "severity": "PAGE", "owner": "retrieval-platform" },
+  "error_rate":        { "max": 0.05, "severity": "PAGE", "owner": "retrieval-platform" },
+  "empty_result_rate": { "max": 0.05, "severity": "WARN", "owner": "search-quality" }
+}

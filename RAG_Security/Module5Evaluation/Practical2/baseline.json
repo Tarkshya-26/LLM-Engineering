@@ -1,0 +1,6 @@
+{
+  "_comment": "Last week's healthy baseline for the same retrieval service. Drift = current is materially worse than this.",
+  "error_rate": 0.03,
+  "empty_result_rate": 0.02,
+  "p95_latency_ms": 150
+}
