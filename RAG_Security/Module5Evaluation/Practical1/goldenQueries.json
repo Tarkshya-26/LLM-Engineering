@@ -1,0 +1,10 @@
+[
+  { "id": "q1", "text": "ANX-14 RAM specification", "query_type": "exact", "relevant_doc_ids": ["doc-003"], "label_note": "The ANX-14 spec sheet is the only doc with the RAM figure." },
+  { "id": "q2", "text": "GDPR data deletion request", "query_type": "exact", "relevant_doc_ids": ["doc-008"], "label_note": "GDPR is covered only by the privacy/compliance doc." },
+  { "id": "q3", "text": "RX-450 firmware update", "query_type": "exact", "relevant_doc_ids": ["doc-011"], "label_note": "Firmware doc for the SmartHub RX-450." },
+  { "id": "q4", "text": "my laptop won't hold a charge", "query_type": "natural_language", "relevant_doc_ids": ["doc-004"], "label_note": "Paraphrase of the battery troubleshooting article." },
+  { "id": "q5", "text": "I can't sign into my account", "query_type": "natural_language", "relevant_doc_ids": ["doc-006"], "label_note": "Paraphrase of the password reset guide." },
+  { "id": "q6", "text": "how do I dispose of an old device responsibly", "query_type": "natural_language", "relevant_doc_ids": ["doc-010"], "label_note": "Paraphrase of the recycling / trade-in program." },
+  { "id": "q7", "text": "RX-450 keeps dropping wifi", "query_type": "mixed", "relevant_doc_ids": ["doc-011", "doc-012"], "label_note": "Needs the firmware doc and the wifi troubleshooting doc." },
+  { "id": "q8", "text": "AeroBook keyboard backlight not working", "query_type": "mixed", "relevant_doc_ids": ["doc-007"], "label_note": "doc-007 is the AeroBook keyboard backlight settings guide." }
+]

@@ -1,0 +1,14 @@
+[
+  { "doc_id": "doc-001", "title": "Return and Refund Policy", "content_type": "policy" },
+  { "doc_id": "doc-002", "title": "Shipping and Delivery Times", "content_type": "policy" },
+  { "doc_id": "doc-003", "title": "AeroBook Pro X14 Technical Specifications (model ANX-14)", "content_type": "spec" },
+  { "doc_id": "doc-004", "title": "AeroBook Pro X14 Battery Troubleshooting", "content_type": "troubleshooting" },
+  { "doc_id": "doc-005", "title": "Warranty Coverage and Claims", "content_type": "policy" },
+  { "doc_id": "doc-006", "title": "Resetting Your Password", "content_type": "how_to" },
+  { "doc_id": "doc-007", "title": "AeroBook Pro X14 Keyboard Backlight Settings", "content_type": "how_to" },
+  { "doc_id": "doc-008", "title": "Data Privacy and GDPR Compliance", "content_type": "legal" },
+  { "doc_id": "doc-009", "title": "Bulk and Enterprise Ordering", "content_type": "policy" },
+  { "doc_id": "doc-010", "title": "Recycling and Trade-In Program", "content_type": "policy" },
+  { "doc_id": "doc-011", "title": "SmartHub RX-450 Firmware Update", "content_type": "spec" },
+  { "doc_id": "doc-012", "title": "SmartHub Slow Wireless Troubleshooting", "content_type": "troubleshooting" }
+]
