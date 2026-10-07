@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/entities/department.schema.json",
+  "title": "Department",
+  "description": "A top-level organisational unit. entities/departments.jsonl. System of record: hris.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common.schema.json#/$defs/record_envelope"
+    }
+  ],
+  "properties": {
+    "department_id": {
+      "$ref": "../common.schema.json#/$defs/department_id"
+    },
+    "tenant_id": {
+      "const": "T-INSURELLM"
+    },
+    "source_system": {
+      "const": "hris"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "code": {
+      "type": "string",
+      "pattern": "^[a-z]+(-[a-z]+)*$",
+      "description": "Short slug, e.g. finance. Matches the department's default group GRP-<code>."
+    },
+    "head_employee_id": {
+      "$ref": "../common.schema.json#/$defs/employee_id"
+    },
+    "parent_department_id": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/department_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "default_group_id": {
+      "$ref": "../common.schema.json#/$defs/group_id"
+    },
+    "cost_center": {
+      "type": "string",
+      "pattern": "^CC-\\d{4}$"
+    }
+  },
+  "required": [
+    "department_id",
+    "name",
+    "code",
+    "head_employee_id",
+    "parent_department_id",
+    "default_group_id",
+    "cost_center"
+  ],
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "tenant_id": "T-INSURELLM",
+      "source_system": "hris",
+      "sensitivity_label": "internal",
+      "record_status": "active",
+      "created_at": "2015-03-01T09:00:00Z",
+      "updated_at": "2025-01-10T09:00:00Z",
+      "department_id": "DEPT-04",
+      "name": "Finance",
+      "code": "finance",
+      "head_employee_id": "EMP-040",
+      "parent_department_id": null,
+      "default_group_id": "GRP-finance",
+      "cost_center": "CC-4000",
+      "origin": "generated"
+    }
+  ]
+}

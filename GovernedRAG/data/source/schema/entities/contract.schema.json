@@ -1,0 +1,222 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/entities/contract.schema.json",
+  "title": "Contract (header)",
+  "description": "The stable identity of an agreement. Terms that can change (price, licenses, dates, scope) live in contract_version rows. entities/contracts.jsonl. System of record: clm.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common.schema.json#/$defs/record_envelope"
+    },
+    {
+      "if": {
+        "properties": {
+          "origin": {
+            "const": "generated"
+          }
+        },
+        "required": [
+          "origin"
+        ]
+      },
+      "then": {
+        "properties": {
+          "contract_number": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "signed_on": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "legal_owner_id": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "insurellm_signatory_id": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "customer_signatory": {
+            "not": {
+              "type": "null"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "contract_id": {
+      "$ref": "../common.schema.json#/$defs/contract_id"
+    },
+    "tenant_id": {
+      "const": "T-INSURELLM"
+    },
+    "source_system": {
+      "const": "clm"
+    },
+    "contract_number": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[A-Z0-9][A-Z0-9-]{2,30}$",
+      "description": "Business key as printed (CL-2025-0234, IG-2023-EG, C-12345-2023). Null where the KB has none."
+    },
+    "customer_id": {
+      "$ref": "../common.schema.json#/$defs/customer_id"
+    },
+    "primary_product_id": {
+      "$ref": "../common.schema.json#/$defs/product_id"
+    },
+    "contract_type": {
+      "enum": [
+        "subscription",
+        "enterprise_license",
+        "pilot",
+        "marketplace_listing"
+      ]
+    },
+    "legal_owner_id": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/employee_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "insurellm_signatory_id": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/employee_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "customer_signatory": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "title": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "signed_on": {
+      "$ref": "../common.schema.json#/$defs/nullable_date"
+    },
+    "current_version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Version number of the contract_version row that is in force at this row's updated_at."
+    },
+    "contract_status": {
+      "enum": [
+        "active",
+        "expired",
+        "terminated",
+        "pending_renewal"
+      ]
+    },
+    "insurellm_signatory_as_printed": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "title": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Name and title exactly as printed on the contract. Never implies an HR identity or any permission."
+    }
+  },
+  "required": [
+    "contract_id",
+    "contract_number",
+    "customer_id",
+    "primary_product_id",
+    "contract_type",
+    "legal_owner_id",
+    "insurellm_signatory_id",
+    "insurellm_signatory_as_printed",
+    "customer_signatory",
+    "signed_on",
+    "current_version",
+    "contract_status"
+  ],
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "tenant_id": "T-INSURELLM",
+      "source_system": "clm",
+      "sensitivity_label": "confidential",
+      "record_status": "active",
+      "created_at": "2025-05-10T09:00:00Z",
+      "updated_at": "2025-05-10T09:00:00Z",
+      "contract_id": "CON-031",
+      "contract_number": "CL-2025-0234",
+      "customer_id": "CUST-012",
+      "primary_product_id": "PROD-007",
+      "contract_type": "subscription",
+      "legal_owner_id": "EMP-045",
+      "insurellm_signatory_id": null,
+      "customer_signatory": {
+        "name": "Rebecca Martinez",
+        "title": "COO"
+      },
+      "signed_on": "2025-05-10",
+      "current_version": 1,
+      "contract_status": "active",
+      "insurellm_signatory_as_printed": {
+        "name": "Sarah Chen",
+        "title": "VP of Sales"
+      },
+      "origin": "kb_seed"
+    }
+  ]
+}

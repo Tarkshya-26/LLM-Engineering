@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/ground_truth/persona.schema.json",
+  "title": "Evaluation persona",
+  "description": "A named test identity used by governance evaluation. ground_truth/personas.jsonl. Every persona is a real principal in access_control/principals.jsonl; nothing here grants access.",
+  "type": "object",
+  "properties": {
+    "schema_version": { "$ref": "../common.schema.json#/$defs/schema_version" },
+    "persona_id": { "$ref": "../common.schema.json#/$defs/persona_id" },
+    "principal_id": { "$ref": "../common.schema.json#/$defs/principal_id" },
+    "label": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "description": { "$ref": "../common.schema.json#/$defs/short_text" },
+    "archetype": {
+      "enum": ["sales_rep", "account_manager", "finance_analyst", "hr_partner", "hr_comp_admin", "engineer", "security_analyst",
+        "support_agent", "people_manager", "executive", "contractor", "former_employee", "customer_portal_user", "baseline_evaluator"]
+    },
+    "intended_use": {
+      "enum": ["governance_eval", "baseline_eval"],
+      "description": "baseline_eval = the service account that reruns the original 150 retrieval tests at T0 with broad internal access. Never used for governance results."
+    }
+  },
+  "required": ["schema_version", "persona_id", "principal_id", "label", "description", "archetype", "intended_use"],
+  "additionalProperties": false,
+  "examples": [{
+    "schema_version": "1.0", "persona_id": "PERS-03", "principal_id": "P-EMP-036", "label": "Sales rep (moves to Finance in BATCH-03)",
+    "description": "On the Carllm account teams at T0; transfers to Finance, losing account-team access and gaining finance access.",
+    "archetype": "sales_rep", "intended_use": "governance_eval"
+  }]
+}

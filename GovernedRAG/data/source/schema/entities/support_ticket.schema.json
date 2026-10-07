@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/entities/support_ticket.schema.json",
+  "title": "Support ticket",
+  "description": "A ticket raised by a customer portal user. Lives in that customer's tenant. entities/support_tickets.jsonl. System of record: support.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common.schema.json#/$defs/record_envelope"
+    }
+  ],
+  "properties": {
+    "ticket_id": {
+      "$ref": "../common.schema.json#/$defs/ticket_id"
+    },
+    "tenant_id": {
+      "type": "string",
+      "pattern": "^T-CUST-\\d{3}$",
+      "description": "Must equal the customer's portal_tenant_id (validator invariant)."
+    },
+    "source_system": {
+      "const": "support"
+    },
+    "sensitivity_label": {
+      "const": "confidential"
+    },
+    "customer_id": {
+      "$ref": "../common.schema.json#/$defs/customer_id"
+    },
+    "product_id": {
+      "$ref": "../common.schema.json#/$defs/product_id"
+    },
+    "contract_id": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/contract_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "opened_by_principal_id": {
+      "type": "string",
+      "pattern": "^P-CUS-\\d{4}$"
+    },
+    "assignee_id": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/employee_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "subject": {
+      "$ref": "../common.schema.json#/$defs/short_text"
+    },
+    "priority": {
+      "enum": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ]
+    },
+    "ticket_status": {
+      "enum": [
+        "new",
+        "open",
+        "pending_customer",
+        "resolved",
+        "closed"
+      ]
+    },
+    "channel": {
+      "enum": [
+        "portal",
+        "email",
+        "phone"
+      ]
+    },
+    "opened_at": {
+      "$ref": "../common.schema.json#/$defs/datetime"
+    },
+    "resolved_at": {
+      "$ref": "../common.schema.json#/$defs/nullable_datetime"
+    },
+    "related_incident_id": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/incident_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "ticket_id",
+    "customer_id",
+    "product_id",
+    "contract_id",
+    "opened_by_principal_id",
+    "assignee_id",
+    "subject",
+    "priority",
+    "ticket_status",
+    "channel",
+    "opened_at",
+    "resolved_at",
+    "related_incident_id"
+  ],
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "tenant_id": "T-CUST-012",
+      "source_system": "support",
+      "sensitivity_label": "confidential",
+      "record_status": "active",
+      "created_at": "2025-06-03T14:22:00Z",
+      "updated_at": "2025-06-04T10:05:00Z",
+      "ticket_id": "TCK-0017",
+      "customer_id": "CUST-012",
+      "product_id": "PROD-007",
+      "contract_id": "CON-031",
+      "opened_by_principal_id": "P-CUS-0004",
+      "assignee_id": "EMP-061",
+      "subject": "FNOL intake rejecting photos larger than 10 MB",
+      "priority": "P2",
+      "ticket_status": "resolved",
+      "channel": "portal",
+      "opened_at": "2025-06-03T14:22:00Z",
+      "resolved_at": "2025-06-04T10:05:00Z",
+      "related_incident_id": null,
+      "origin": "generated"
+    }
+  ]
+}

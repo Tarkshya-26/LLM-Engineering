@@ -1,0 +1,659 @@
+
+# Insurellm authorization policy set
+#
+# Contract: schema/access_control/policy_set.schema.json
+# Check:    python data/source/tools/check_schemas.py   (from the GovernedRAG root)
+#
+# How a decision is made, for one principal and one document version:
+#
+#   1. global_deny  Any rule matches            -> DENY (final)
+#   2. tenant       Rule for (principal_type, document tenant)
+#                     never                        -> DENY (final)
+#                     public_only and label != public -> DENY (final)
+#                     scope_required and tenant not in service_scopes -> DENY (final)
+#   3. label        principal_type not allowed for the label -> DENY (final)
+#                   label does not require a grant (public, internal), and the
+#                   tenant rule was not grant_required -> ALLOW
+#   4. grant        At least one VALID grant on the document matches -> ALLOW
+#                   otherwise                    -> DENY (default)
+#
+# A deny at any step is final. Nothing later (a grant, a role, an executive title)
+# can override it. There is no allow-override and no break-glass in v1.
+# All dates are quoted so YAML loaders keep them as strings.
+
+schema_version: "1.0"
+policy_set_id: PSET-001
+version: 1
+effective_from: "2025-06-30"
+default_decision: deny
+
+label_order: [public, internal, confidential, restricted]
+
+decision_order: [global_deny, tenant, label, grant]
+
+# ---------------------------------------------------------------------------
+# Step 1. Global denies: checked before anything else
+# ---------------------------------------------------------------------------
+global_deny_rules:
+  - rule_id: GD-01
+    condition: principal_not_active
+    description: Disabled or deleted principals (e.g. terminated employees) get nothing.
+  - rule_id: GD-02
+    condition: document_deleted
+    description: A deleted document version is never returned, whatever its grants say.
+  - rule_id: GD-03
+    condition: document_tenant_not_active
+    description: Documents in a suspended or offboarded customer tenant are unreadable by everyone.
+
+# ---------------------------------------------------------------------------
+# Grant validity: a grant that fails any of these is ignored (cannot allow)
+# ---------------------------------------------------------------------------
+grant_validity_rules:
+  - rule_id: GV-01
+    condition: membership_not_valid_at_decision_time
+    description: Group grants count only if the membership's valid_from..valid_to covers the decision time.
+  - rule_id: GV-02
+    condition: edge_not_valid_at_decision_time
+    description: Relation grants count only if every edge on the path is valid at the decision time.
+  - rule_id: GV-03
+    condition: group_not_active
+    description: Retired groups confer nothing.
+  - rule_id: GV-04
+    condition: document_label_above_group_max_label
+    description: A group cannot open a document labelled above its max_label, even if the document lists it.
+  - rule_id: GV-05
+    condition: relation_not_allowed_for_label
+    description: A relation grant counts only if the label's allowed_relations include it (restricted allows self only).
+  - rule_id: GV-06
+    condition: grant_type_not_allowed_for_label
+    description: A grant counts only if its type is in the label's allowed_grant_types.
+
+# ---------------------------------------------------------------------------
+# Step 2. Tenant rules: every (principal_type, document tenant) pair, 3 x 3
+# ---------------------------------------------------------------------------
+tenant_rules:
+  - rule_id: TR-01
+    principal_type: employee
+    document_tenant: internal
+    access: allowed
+    description: Employees read the internal tenant, subject to labels and grants.
+  - rule_id: TR-02
+    principal_type: employee
+    document_tenant: own_customer_tenant
+    access: never
+    description: Not applicable (employees have no customer tenant); listed so no case is implicit.
+  - rule_id: TR-03
+    principal_type: employee
+    document_tenant: other_customer_tenant
+    access: grant_required
+    description: Employees read a customer's tenant only through an explicit grant (support group or account team).
+  - rule_id: TR-04
+    principal_type: customer_user
+    document_tenant: internal
+    access: public_only
+    description: Customer users see only public Insurellm documents, never internal or above.
+  - rule_id: TR-05
+    principal_type: customer_user
+    document_tenant: own_customer_tenant
+    access: allowed
+    description: Customer users read their own tenant (via tenant_membership at the grant step).
+  - rule_id: TR-06
+    principal_type: customer_user
+    document_tenant: other_customer_tenant
+    access: never
+    description: Tenant isolation. Another customer's data is never visible, however relevant.
+  - rule_id: TR-07
+    principal_type: service_account
+    document_tenant: internal
+    access: scope_required
+    description: Service accounts act only in tenants listed in their service_scopes.
+  - rule_id: TR-08
+    principal_type: service_account
+    document_tenant: own_customer_tenant
+    access: never
+    description: Not applicable (service accounts are homed in the internal tenant); listed for completeness.
+  - rule_id: TR-09
+    principal_type: service_account
+    document_tenant: other_customer_tenant
+    access: scope_required
+    description: A service account reaches a customer tenant only if that tenant is in its service_scopes.
+
+# ---------------------------------------------------------------------------
+# Step 3. Sensitivity labels
+# ---------------------------------------------------------------------------
+label_rules:
+  - label: public
+    allowed_principal_types: [employee, customer_user, service_account]
+    requires_grant: false
+    allowed_grant_types: []
+    allowed_relations: []
+    description: Anyone who passes the tenant step. Website pages, press releases, list prices.
+  - label: internal
+    allowed_principal_types: [employee, service_account]
+    requires_grant: false
+    allowed_grant_types: []
+    allowed_relations: []
+    description: Any active employee, contractors included. Never customer users.
+  - label: confidential
+    allowed_principal_types: [employee, customer_user, service_account]
+    requires_grant: true
+    allowed_grant_types: [group, relation, principal, tenant_membership]
+    allowed_relations: [self, manager_of, account_team_of]
+    description: Need-to-know. Customer users reach it only inside their own tenant.
+  - label: restricted
+    allowed_principal_types: [employee, service_account]
+    requires_grant: true
+    allowed_grant_types: [group, relation, principal]
+    allowed_relations: [self]
+    description: Small audited audiences. Only self among relations, so managers never see pay.
+
+# ---------------------------------------------------------------------------
+# Relationship-based grants (evaluated over relationships/edges.jsonl)
+# ---------------------------------------------------------------------------
+relation_definitions:
+  - name: self
+    subject_type: employee
+    description: The principal is the employee the document is about.
+    evaluation:
+      kind: principal_is_subject
+      edge_relations: []
+      direction: null
+      transitive: false
+      max_depth: null
+      evaluated_as_of: decision_time
+  - name: manager_of
+    subject_type: employee
+    description: The subject reports to the principal directly, or one level further down (skip-level).
+    evaluation:
+      kind: edge
+      edge_relations: [reports_to]
+      direction: subject_to_principal
+      transitive: true
+      max_depth: 2
+      evaluated_as_of: decision_time
+  - name: account_team_of
+    subject_type: customer
+    description: The principal is on the customer's account team (customer.account_team_ids).
+    evaluation:
+      kind: edge
+      edge_relations: [account_team_member_of]
+      direction: principal_to_subject
+      transitive: false
+      max_depth: 1
+      evaluated_as_of: decision_time
+
+# ---------------------------------------------------------------------------
+# Groups: the complete catalog. No nested groups. Contractors are excluded
+# from every group, so they see public and internal only.
+# ---------------------------------------------------------------------------
+groups:
+  # Department groups: everyone in the department, as of each date
+  - group_id: GRP-engineering
+    name: Engineering
+    group_type: department
+    department_code: engineering
+    max_label: confidential
+    membership_rule: { kind: department_members, department_code: engineering, exclude_employment_types: [contractor] }
+    description: All engineering staff, including data and platform teams.
+  - group_id: GRP-product
+    name: Product
+    group_type: department
+    department_code: product
+    max_label: confidential
+    membership_rule: { kind: department_members, department_code: product, exclude_employment_types: [contractor] }
+    description: Product management and design.
+  - group_id: GRP-finance
+    name: Finance
+    group_type: department
+    department_code: finance
+    max_label: confidential
+    membership_rule: { kind: department_members, department_code: finance, exclude_employment_types: [contractor] }
+    description: Finance team. Confidential ceiling, so finance staff never see board packs or deal-desk approvals by default.
+  - group_id: GRP-sales
+    name: Sales
+    group_type: department
+    department_code: sales
+    max_label: confidential
+    membership_rule: { kind: department_members, department_code: sales, exclude_employment_types: [contractor] }
+    description: All sales staff. Sees customer account profiles, but contracts only via account teams.
+  - group_id: GRP-hr
+    name: People (HR)
+    group_type: department
+    department_code: hr
+    max_label: confidential
+    membership_rule: { kind: department_members, department_code: hr, exclude_employment_types: [contractor] }
+    description: HR partners. Reads performance reviews; compensation is restricted to GRP-hr-comp.
+  - group_id: GRP-legal
+    name: Legal
+    group_type: department
+    department_code: legal
+    max_label: confidential
+    membership_rule: { kind: department_members, department_code: legal, exclude_employment_types: [contractor] }
+    description: Legal team. Reads every contract version.
+  - group_id: GRP-customer-success
+    name: Customer Success
+    group_type: department
+    department_code: customer-success
+    max_label: confidential
+    membership_rule: { kind: department_members, department_code: customer-success, exclude_employment_types: [contractor] }
+    description: Customer success managers and support staff.
+  - group_id: GRP-marketing
+    name: Marketing
+    group_type: department
+    department_code: marketing
+    max_label: confidential
+    membership_rule: { kind: department_members, department_code: marketing, exclude_employment_types: [contractor] }
+    description: Marketing. Kept for completeness; no document type grants it beyond internal in v1.
+  - group_id: GRP-security
+    name: Security
+    group_type: department
+    department_code: security
+    max_label: confidential
+    membership_rule: { kind: department_members, department_code: security, exclude_employment_types: [contractor] }
+    description: Security team. Detailed incident reports need GRP-security-ir.
+  - group_id: GRP-operations
+    name: Operations
+    group_type: department
+    department_code: operations
+    max_label: confidential
+    membership_rule: { kind: department_members, department_code: operations, exclude_employment_types: [contractor] }
+    description: Business and IT operations.
+
+  # Functional groups: cut across departments
+  - group_id: GRP-executive
+    name: Executives
+    group_type: functional
+    department_code: executive
+    max_label: confidential
+    membership_rule: { kind: job_levels, levels: [E1, E2, E3], exclude_employment_types: [contractor] }
+    description: C-suite and VPs, whatever their department. Confidential ceiling, so VPs never reach restricted data through this group.
+  - group_id: GRP-support
+    name: Support Agents
+    group_type: functional
+    department_code: null
+    max_label: confidential
+    membership_rule: { kind: job_titles, titles: [Technical Support Specialist, Support Engineer, Senior Support Engineer, Support Team Lead, Head of Support], exclude_employment_types: [contractor] }
+    description: Reads support tickets in every customer tenant.
+
+  # Restricted groups: small, named audiences
+  - group_id: GRP-hr-comp
+    name: HR Compensation
+    group_type: restricted
+    department_code: hr
+    max_label: restricted
+    membership_rule: { kind: job_titles, titles: [Chief People Officer, Compensation and Benefits Manager, Chief Executive Officer, "Co-Founder & Chief Executive Officer (CEO)", Chief Financial Officer], exclude_employment_types: [contractor] }
+    description: The only group granted on compensation records.
+  - group_id: GRP-security-ir
+    name: Security Incident Response
+    group_type: restricted
+    department_code: security
+    max_label: restricted
+    membership_rule: { kind: job_titles, titles: [Chief Information Security Officer, Senior Security Engineer, Security Incident Responder], exclude_employment_types: [contractor] }
+    description: Reads full incident reports, including affected customers and records exposed.
+  - group_id: GRP-board
+    name: Board Reporting
+    group_type: restricted
+    department_code: executive
+    max_label: restricted
+    membership_rule: { kind: job_titles, titles: [Chief Executive Officer, "Co-Founder & Chief Executive Officer (CEO)", Chief Financial Officer, Chief Technology Officer, "Chief Technology Officer (CTO)", Chief Operating Officer], exclude_employment_types: [contractor] }
+    description: Board packs, and the confidential acquisition project alongside its named members.
+  - group_id: GRP-deal-desk
+    name: Deal Desk
+    group_type: restricted
+    department_code: sales
+    max_label: restricted
+    membership_rule: { kind: job_titles, titles: [Chief Revenue Officer, VP of Sales, Director of Sales, Chief Financial Officer, Financial Controller], exclude_employment_types: [contractor] }
+    description: Approves non-standard discounts. Only group granted on pricing approvals.
+
+# ---------------------------------------------------------------------------
+# Service accounts
+# ---------------------------------------------------------------------------
+service_bindings:
+  - principal_id: P-SVC-001
+    purpose: baseline_eval
+    groups: [GRP-hr, GRP-hr-comp, GRP-legal, GRP-finance, GRP-sales]
+    service_scopes: [T-INSURELLM]
+    description: Reruns the original 150 retrieval tests at T0. Least privilege for those tests; never used for governance results.
+
+# ---------------------------------------------------------------------------
+# Document-type defaults: one per document type (28).
+# A document may be tighter, never looser.
+# ---------------------------------------------------------------------------
+document_type_defaults:
+  # hris
+  - document_type: employee_profile
+    source_system: hris
+    tenant_scope: internal
+    sensitivity_label: internal
+    access_groups: []
+    access_relation_templates: []
+    access_principal_templates: []
+    retention_class: personal_data
+    content_origin: internal
+    description: Role, team, location, hire date, recognitions. No pay, no ratings, no date of birth.
+  - document_type: compensation_record
+    source_system: hris
+    tenant_scope: internal
+    sensitivity_label: restricted
+    access_groups: [GRP-hr-comp]
+    access_relation_templates: [{ relation: self, subject_from: primary_employee }]
+    access_principal_templates: []
+    retention_class: personal_data
+    content_origin: internal
+    description: Pay history. HR compensation and the employee only.
+  - document_type: performance_review
+    source_system: hris
+    tenant_scope: internal
+    sensitivity_label: confidential
+    access_groups: [GRP-hr]
+    access_relation_templates: [{ relation: self, subject_from: primary_employee }, { relation: manager_of, subject_from: primary_employee }]
+    access_principal_templates: []
+    retention_class: personal_data
+    content_origin: internal
+    description: Annual reviews. HR, the employee, their manager and skip-level.
+
+  # crm
+  - document_type: customer_account_profile
+    source_system: crm
+    tenant_scope: internal
+    sensitivity_label: confidential
+    access_groups: [GRP-sales, GRP-customer-success, GRP-executive]
+    access_relation_templates: [{ relation: account_team_of, subject_from: primary_customer }]
+    access_principal_templates: []
+    retention_class: standard
+    content_origin: internal
+    description: Who the customer is, products used, account team. Commercial terms live in contracts.
+  - document_type: account_plan
+    source_system: crm
+    tenant_scope: internal
+    sensitivity_label: confidential
+    access_groups: [GRP-executive]
+    access_relation_templates: [{ relation: account_team_of, subject_from: primary_customer }]
+    access_principal_templates: []
+    retention_class: standard
+    content_origin: internal
+    description: Account strategy and renewal risk. The account team and executives only.
+
+  # clm
+  - document_type: contract
+    source_system: clm
+    tenant_scope: internal
+    sensitivity_label: confidential
+    access_groups: [GRP-legal, GRP-finance, GRP-executive]
+    access_relation_templates: [{ relation: account_team_of, subject_from: primary_customer }]
+    access_principal_templates: []
+    retention_class: financial_record
+    content_origin: internal
+    description: The original agreement (v1). A sales rep sees it only for accounts they are on.
+  - document_type: contract_amendment
+    source_system: clm
+    tenant_scope: internal
+    sensitivity_label: confidential
+    access_groups: [GRP-legal, GRP-finance, GRP-executive]
+    access_relation_templates: [{ relation: account_team_of, subject_from: primary_customer }]
+    access_principal_templates: []
+    retention_class: financial_record
+    content_origin: internal
+    description: Changes to price, licenses, dates or scope (v2+).
+  - document_type: contract_renewal
+    source_system: clm
+    tenant_scope: internal
+    sensitivity_label: confidential
+    access_groups: [GRP-legal, GRP-finance, GRP-executive]
+    access_relation_templates: [{ relation: account_team_of, subject_from: primary_customer }]
+    access_principal_templates: []
+    retention_class: financial_record
+    content_origin: internal
+    description: A new term for an existing contract (v2+).
+  - document_type: pricing_approval
+    source_system: clm
+    tenant_scope: internal
+    sensitivity_label: restricted
+    access_groups: [GRP-deal-desk]
+    access_relation_templates: []
+    access_principal_templates: []
+    retention_class: financial_record
+    content_origin: internal
+    description: Discount approvals with margin reasoning. Not visible to the account team.
+
+  # erp
+  - document_type: financial_report
+    source_system: erp
+    tenant_scope: internal
+    sensitivity_label: confidential
+    access_groups: [GRP-finance, GRP-executive]
+    access_relation_templates: []
+    access_principal_templates: []
+    retention_class: financial_record
+    content_origin: internal
+    description: Quarterly P&L and product revenue.
+  - document_type: department_budget
+    source_system: erp
+    tenant_scope: internal
+    sensitivity_label: confidential
+    access_groups: [GRP-finance, GRP-executive]
+    access_relation_templates: []
+    access_principal_templates: [department_head]
+    retention_class: financial_record
+    content_origin: internal
+    description: One department's budget. Finance, executives and that department's head.
+  - document_type: receivables_summary
+    source_system: erp
+    tenant_scope: internal
+    sensitivity_label: confidential
+    access_groups: [GRP-finance]
+    access_relation_templates: []
+    access_principal_templates: []
+    retention_class: financial_record
+    content_origin: internal
+    description: Who owes what, by customer. Finance only.
+  - document_type: board_pack
+    source_system: erp
+    tenant_scope: internal
+    sensitivity_label: restricted
+    access_groups: [GRP-board]
+    access_relation_templates: []
+    access_principal_templates: []
+    retention_class: financial_record
+    content_origin: internal
+    description: Board metrics, including aggregate payroll and revenue (indirect-leak trap).
+
+  # wiki
+  - document_type: product_overview
+    source_system: wiki
+    tenant_scope: internal
+    sensitivity_label: internal
+    access_groups: []
+    access_relation_templates: []
+    access_principal_templates: []
+    retention_class: standard
+    content_origin: internal
+    description: What a product does, tiers, tech lead, roadmap.
+  - document_type: technical_architecture
+    source_system: wiki
+    tenant_scope: internal
+    sensitivity_label: confidential
+    access_groups: [GRP-engineering, GRP-product, GRP-security]
+    access_relation_templates: []
+    access_principal_templates: []
+    retention_class: standard
+    content_origin: internal
+    description: System design, integrations, data flows.
+  - document_type: runbook
+    source_system: wiki
+    tenant_scope: internal
+    sensitivity_label: confidential
+    access_groups: [GRP-engineering, GRP-operations, GRP-support, GRP-security]
+    access_relation_templates: []
+    access_principal_templates: []
+    retention_class: standard
+    content_origin: internal
+    description: Operational procedures and escalation paths.
+  - document_type: company_page
+    source_system: wiki
+    tenant_scope: internal
+    sensitivity_label: internal
+    access_groups: []
+    access_relation_templates: []
+    access_principal_templates: []
+    retention_class: standard
+    content_origin: internal
+    description: Company overview, culture, values, offices.
+  - document_type: employee_handbook
+    source_system: wiki
+    tenant_scope: internal
+    sensitivity_label: internal
+    access_groups: []
+    access_relation_templates: []
+    access_principal_templates: []
+    retention_class: standard
+    content_origin: internal
+    description: How we work, benefits, leave and tools.
+  - document_type: meeting_notes
+    source_system: wiki
+    tenant_scope: internal
+    sensitivity_label: internal
+    access_groups: []
+    access_relation_templates: []
+    access_principal_templates: []
+    retention_class: standard
+    content_origin: internal
+    description: All-hands and team notes.
+
+  # grc
+  - document_type: policy
+    source_system: grc
+    tenant_scope: internal
+    sensitivity_label: internal
+    access_groups: []
+    access_relation_templates: []
+    access_principal_templates: []
+    retention_class: standard
+    content_origin: internal
+    description: Company policies. Some (e.g. incident response plan) are tightened to confidential per document.
+
+  # itsm
+  - document_type: incident_report
+    source_system: itsm
+    tenant_scope: internal
+    sensitivity_label: restricted
+    access_groups: [GRP-security-ir, GRP-board]
+    access_relation_templates: []
+    access_principal_templates: []
+    retention_class: legal_hold
+    content_origin: internal
+    description: Full incident detail, affected customers, records exposed.
+  - document_type: postmortem_summary
+    source_system: itsm
+    tenant_scope: internal
+    sensitivity_label: internal
+    access_groups: []
+    access_relation_templates: []
+    access_principal_templates: []
+    retention_class: standard
+    content_origin: internal
+    description: Sanitised lessons learned. No customer names, no record counts.
+
+  # pm
+  - document_type: project_brief
+    source_system: pm
+    tenant_scope: internal
+    sensitivity_label: internal
+    access_groups: []
+    access_relation_templates: []
+    access_principal_templates: []
+    retention_class: standard
+    content_origin: internal
+    description: Goals, team, timeline. The acquisition project is tightened to restricted (GRP-board + project members).
+  - document_type: roadmap
+    source_system: pm
+    tenant_scope: internal
+    sensitivity_label: internal
+    access_groups: []
+    access_relation_templates: []
+    access_principal_templates: []
+    retention_class: standard
+    content_origin: internal
+    description: Product roadmap by quarter.
+
+  # support (customer tenants)
+  - document_type: support_ticket
+    source_system: support
+    tenant_scope: customer
+    sensitivity_label: confidential
+    access_groups: [GRP-support]
+    access_relation_templates: [{ relation: account_team_of, subject_from: primary_customer }]
+    access_principal_templates: []
+    retention_class: standard
+    content_origin: customer_submitted
+    description: Lives in the customer's tenant. Its users (tenant_membership), support agents and the account team.
+
+  # public_web
+  - document_type: public_product_page
+    source_system: public_web
+    tenant_scope: internal
+    sensitivity_label: public
+    access_groups: []
+    access_relation_templates: []
+    access_principal_templates: []
+    retention_class: standard
+    content_origin: public_source
+    description: Marketing page with list prices.
+  - document_type: press_release
+    source_system: public_web
+    tenant_scope: internal
+    sensitivity_label: public
+    access_groups: []
+    access_relation_templates: []
+    access_principal_templates: []
+    retention_class: standard
+    content_origin: public_source
+    description: Announcements. May name customers with is_public_reference = true, never their terms.
+  - document_type: company_about
+    source_system: public_web
+    tenant_scope: internal
+    sensitivity_label: public
+    access_groups: []
+    access_relation_templates: []
+    access_principal_templates: []
+    retention_class: standard
+    content_origin: public_source
+    description: Public company page.
+
+# ---------------------------------------------------------------------------
+# Lifecycle visibility: NOT authorization. Authorization still runs on every
+# version that retrieval returns, using that version's own grants.
+# ---------------------------------------------------------------------------
+lifecycle_visibility:
+  current: default_visible
+  superseded: history_only
+  archived: history_only
+  deleted: never
+
+# ---------------------------------------------------------------------------
+# Historical versions (approved): history never grants more than the present.
+# A superseded or archived version is returned only if the principal passes
+# BOTH that version's own grants AND the current version's grants.
+# ---------------------------------------------------------------------------
+historical_version_authorization:
+  rule: must_pass_own_and_current
+  when_no_current_version: own_grants_only
+  description: History never grants more than the current version. Both checks run at decision time.
+
+# ---------------------------------------------------------------------------
+# Erasure (one former employee in BATCH-04)
+# ---------------------------------------------------------------------------
+erasure:
+  deletes_retention_classes: [personal_data]
+  retains_retention_classes: [standard, financial_record, legal_hold]
+  deletes_entity_types: [compensation, performance_review]
+  nulls_entity_fields: [employee.date_of_birth, employee.preferred_name]
+  cdc_before_image: ids_only
+
+# ---------------------------------------------------------------------------
+# Audit
+# ---------------------------------------------------------------------------
+audit:
+  log_allows_for_labels: [confidential, restricted]
+  log_all_denies: true
+  retain_days: 365

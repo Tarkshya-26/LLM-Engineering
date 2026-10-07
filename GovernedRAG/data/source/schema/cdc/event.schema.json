@@ -1,0 +1,1171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/cdc/event.schema.json",
+  "title": "CDC change event",
+  "description": "One change after T0, in DELIVERY order (file order of cdc/events.jsonl). sequence is the source COMMIT order. A consumer must be idempotent (same event_id may be delivered twice) and order-aware (a lower sequence may arrive after a higher one for the same object). Deliberate anomalies are listed only in ground_truth/checkpoints.jsonl, never flagged here.",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "$ref": "../common.schema.json#/$defs/schema_version"
+    },
+    "event_id": {
+      "$ref": "../common.schema.json#/$defs/event_id"
+    },
+    "batch_id": {
+      "type": "string",
+      "pattern": "^BATCH-(0[1-9]|[1-9]\\d)$",
+      "description": "BATCH-00 is the snapshot itself and has no events."
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Global commit order across all source systems. Unique per distinct event."
+    },
+    "occurred_at": {
+      "$ref": "../common.schema.json#/$defs/datetime",
+      "description": "When the change committed in the source system."
+    },
+    "emitted_at": {
+      "$ref": "../common.schema.json#/$defs/datetime",
+      "description": "When it was delivered. Redeliveries have a later emitted_at."
+    },
+    "source_system": {
+      "$ref": "../common.schema.json#/$defs/source_system"
+    },
+    "operation": {
+      "enum": [
+        "insert",
+        "update",
+        "delete"
+      ]
+    },
+    "object_type": {
+      "enum": [
+        "location",
+        "department",
+        "team",
+        "employee",
+        "compensation",
+        "performance_review",
+        "product",
+        "product_tier",
+        "customer",
+        "contract",
+        "contract_version",
+        "project",
+        "policy",
+        "policy_version",
+        "incident",
+        "support_ticket",
+        "financial_record",
+        "document_version",
+        "tenant",
+        "principal",
+        "group",
+        "membership",
+        "policy_set"
+      ]
+    },
+    "object_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Primary key of the changed object (entity id, document_version_id, principal_id, group_id, membership_id, policy_set_id, tenant_id)."
+    },
+    "idempotency_key": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9@_.-]+:[0-9]+$",
+      "description": "object_id + ':' + sequence. Applying the same key twice must be a no-op."
+    },
+    "actor_principal_id": {
+      "$ref": "../common.schema.json#/$defs/principal_id",
+      "description": "Who made the change in the source system."
+    },
+    "reason": {
+      "enum": [
+        "new_record",
+        "amendment",
+        "renewal",
+        "correction",
+        "org_change",
+        "access_change",
+        "offboarding",
+        "erasure_request",
+        "archival",
+        "price_change",
+        "policy_revision",
+        "status_change"
+      ]
+    },
+    "before": {
+      "description": "Row/front matter before the change. Null for insert."
+    },
+    "after": {
+      "description": "Row/front matter after the change. Null for delete."
+    }
+  },
+  "required": [
+    "schema_version",
+    "event_id",
+    "batch_id",
+    "sequence",
+    "occurred_at",
+    "emitted_at",
+    "source_system",
+    "operation",
+    "object_type",
+    "object_id",
+    "idempotency_key",
+    "actor_principal_id",
+    "reason",
+    "before",
+    "after"
+  ],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "$comment": "insert: no before image, full after image",
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "insert"
+          }
+        },
+        "required": [
+          "operation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "before": {
+            "type": "null"
+          },
+          "after": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "$comment": "update: both images",
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "update"
+          }
+        },
+        "required": [
+          "operation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "before": {
+            "type": "object"
+          },
+          "after": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "$comment": "delete: before image only. For personal-data erasure the before image is reduced to ids (see README).",
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "delete"
+          }
+        },
+        "required": [
+          "operation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "before": {
+            "type": "object"
+          },
+          "after": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "location"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../entities/location.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../entities/location.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "department"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../entities/department.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../entities/department.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "team"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../entities/team.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../entities/team.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "employee"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../entities/employee.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../entities/employee.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "compensation"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../entities/compensation.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../entities/compensation.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "performance_review"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../entities/performance_review.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../entities/performance_review.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "product"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../entities/product.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../entities/product.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "product_tier"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../entities/product_tier.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../entities/product_tier.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "customer"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../entities/customer.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../entities/customer.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "contract"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../entities/contract.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../entities/contract.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "contract_version"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../entities/contract_version.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../entities/contract_version.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "project"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../entities/project.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../entities/project.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "policy"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../entities/policy.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../entities/policy.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "policy_version"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../entities/policy_version.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../entities/policy_version.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "incident"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../entities/incident.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../entities/incident.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "support_ticket"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../entities/support_ticket.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../entities/support_ticket.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "financial_record"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../entities/financial_record.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../entities/financial_record.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "document_version"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/document_version_image"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "#/$defs/document_version_image"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "tenant"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../access_control/tenant.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../access_control/tenant.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "principal"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../access_control/principal.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../access_control/principal.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "group"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../access_control/group.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../access_control/group.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "membership"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../access_control/membership.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../access_control/membership.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "object_type": {
+            "const": "policy_set"
+          }
+        },
+        "required": [
+          "object_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "after": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "../access_control/policy_set.schema.json"
+              }
+            ]
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/erased_image"
+              },
+              {
+                "$ref": "../access_control/policy_set.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "document_version_image": {
+      "type": "object",
+      "description": "A document version as seen by CDC: its front matter plus where the body lives.",
+      "properties": {
+        "front_matter": {
+          "$ref": "../documents/front_matter.schema.json"
+        },
+        "body_path": {
+          "type": "string",
+          "pattern": "^documents/(hris|crm|clm|erp|wiki|grc|itsm|pm|support|public_web)/DOC-[A-Z]+-\\d{4}/v[1-9]\\d*\\.md$"
+        }
+      },
+      "required": [
+        "front_matter",
+        "body_path"
+      ],
+      "additionalProperties": false
+    },
+    "erased_image": {
+      "type": "object",
+      "description": "Before image of an erasure delete: identifiers only, so the event log itself does not retain the personal data.",
+      "properties": {
+        "erased": {
+          "const": true
+        },
+        "object_id": {
+          "type": "string"
+        },
+        "subject_employee_id": {
+          "$ref": "../common.schema.json#/$defs/employee_id"
+        }
+      },
+      "required": [
+        "erased",
+        "object_id"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "event_id": "EVT-000231",
+      "batch_id": "BATCH-03",
+      "sequence": 231,
+      "occurred_at": "2025-10-01T09:00:00Z",
+      "emitted_at": "2025-10-01T09:00:04Z",
+      "source_system": "hris",
+      "operation": "update",
+      "object_type": "membership",
+      "object_id": "MEM-00117",
+      "idempotency_key": "MEM-00117:231",
+      "actor_principal_id": "P-EMP-050",
+      "reason": "org_change",
+      "before": {
+        "schema_version": "1.0",
+        "membership_id": "MEM-00117",
+        "principal_id": "P-EMP-036",
+        "group_id": "GRP-sales",
+        "membership_role": "member",
+        "valid_from": "2023-02-01",
+        "valid_to": null,
+        "granted_by": "P-EMP-050",
+        "grant_reason": "department_default"
+      },
+      "after": {
+        "schema_version": "1.0",
+        "membership_id": "MEM-00117",
+        "principal_id": "P-EMP-036",
+        "group_id": "GRP-sales",
+        "membership_role": "member",
+        "valid_from": "2023-02-01",
+        "valid_to": "2025-09-30",
+        "granted_by": "P-EMP-050",
+        "grant_reason": "department_default"
+      }
+    }
+  ]
+}

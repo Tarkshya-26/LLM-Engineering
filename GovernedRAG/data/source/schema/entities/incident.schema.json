@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/entities/incident.schema.json",
+  "title": "Security incident",
+  "description": "A security or availability incident. Detailed reports are restricted to security; postmortem summaries may be internal. entities/incidents.jsonl. System of record: itsm.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common.schema.json#/$defs/record_envelope"
+    },
+    {
+      "if": {
+        "properties": {
+          "incident_status": {
+            "enum": [
+              "resolved",
+              "closed"
+            ]
+          }
+        },
+        "required": [
+          "incident_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "resolved_at": {
+            "$ref": "../common.schema.json#/$defs/datetime"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "resolved_at": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "incident_id": {
+      "$ref": "../common.schema.json#/$defs/incident_id"
+    },
+    "tenant_id": {
+      "const": "T-INSURELLM"
+    },
+    "source_system": {
+      "const": "itsm"
+    },
+    "title": {
+      "$ref": "../common.schema.json#/$defs/short_text"
+    },
+    "severity": {
+      "enum": [
+        "SEV1",
+        "SEV2",
+        "SEV3",
+        "SEV4"
+      ]
+    },
+    "category": {
+      "enum": [
+        "phishing",
+        "data_exposure",
+        "malware",
+        "access_misuse",
+        "availability",
+        "vulnerability",
+        "third_party"
+      ]
+    },
+    "incident_status": {
+      "enum": [
+        "open",
+        "contained",
+        "resolved",
+        "closed"
+      ]
+    },
+    "detected_at": {
+      "$ref": "../common.schema.json#/$defs/datetime"
+    },
+    "resolved_at": {
+      "$ref": "../common.schema.json#/$defs/nullable_datetime"
+    },
+    "incident_commander_id": {
+      "$ref": "../common.schema.json#/$defs/employee_id"
+    },
+    "responder_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "../common.schema.json#/$defs/employee_id"
+      }
+    },
+    "affected_product_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "../common.schema.json#/$defs/product_id"
+      }
+    },
+    "affected_customer_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "../common.schema.json#/$defs/customer_id"
+      }
+    },
+    "records_exposed": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "root_cause_category": {
+      "enum": [
+        "misconfiguration",
+        "credential_compromise",
+        "software_defect",
+        "vendor_failure",
+        "human_error",
+        "unknown"
+      ]
+    },
+    "customer_notification_required": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "incident_id",
+    "title",
+    "severity",
+    "category",
+    "incident_status",
+    "detected_at",
+    "resolved_at",
+    "incident_commander_id",
+    "responder_ids",
+    "affected_product_ids",
+    "affected_customer_ids",
+    "records_exposed",
+    "root_cause_category",
+    "customer_notification_required"
+  ],
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "tenant_id": "T-INSURELLM",
+      "source_system": "itsm",
+      "sensitivity_label": "restricted",
+      "record_status": "active",
+      "created_at": "2025-03-14T02:10:00Z",
+      "updated_at": "2025-03-20T17:00:00Z",
+      "incident_id": "INC-004",
+      "title": "Misconfigured storage bucket exposed Healthllm export files",
+      "severity": "SEV2",
+      "category": "data_exposure",
+      "incident_status": "closed",
+      "detected_at": "2025-03-14T02:10:00Z",
+      "resolved_at": "2025-03-14T09:45:00Z",
+      "incident_commander_id": "EMP-055",
+      "responder_ids": [
+        "EMP-055",
+        "EMP-056"
+      ],
+      "affected_product_ids": [
+        "PROD-005"
+      ],
+      "affected_customer_ids": [
+        "CUST-020"
+      ],
+      "records_exposed": 1200,
+      "root_cause_category": "misconfiguration",
+      "customer_notification_required": true,
+      "origin": "generated"
+    }
+  ]
+}

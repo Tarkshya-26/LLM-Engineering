@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/entities/product_tier.schema.json",
+  "title": "Product tier",
+  "description": "A list-price tier of one product for a period. A price change creates a new row and closes the old one (valid_to). entities/product_tiers.jsonl. System of record: pm. List prices are public.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common.schema.json#/$defs/record_envelope"
+    },
+    {
+      "if": {
+        "properties": {
+          "pricing_model": {
+            "const": "custom"
+          }
+        },
+        "required": [
+          "pricing_model"
+        ]
+      },
+      "then": {
+        "properties": {
+          "monthly_list_price": {
+            "type": "null"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "monthly_list_price": {
+            "$ref": "../common.schema.json#/$defs/money"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "origin": {
+            "const": "generated"
+          }
+        },
+        "required": [
+          "origin"
+        ]
+      },
+      "then": {
+        "properties": {
+          "valid_from": {
+            "not": {
+              "type": "null"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "tier_id": {
+      "$ref": "../common.schema.json#/$defs/tier_id"
+    },
+    "tenant_id": {
+      "const": "T-INSURELLM"
+    },
+    "source_system": {
+      "const": "pm"
+    },
+    "product_id": {
+      "$ref": "../common.schema.json#/$defs/product_id"
+    },
+    "tier_name": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Za-z -]+$",
+      "description": "Free text in the existing KB (Basic, Professional, Advanced, Growth, ...)."
+    },
+    "tier_rank": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "1 = entry tier."
+    },
+    "monthly_list_price": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/money"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "price_unit": {
+      "enum": [
+        "per_month",
+        "per_listing_per_month",
+        "per_user_per_month",
+        "per_lead"
+      ]
+    },
+    "included_capacity": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "metric": {
+            "$ref": "../common.schema.json#/$defs/snake_case"
+          },
+          "limit": {
+            "type": "number",
+            "minimum": 0
+          },
+          "period": {
+            "enum": [
+              "month",
+              "year",
+              "contract"
+            ]
+          }
+        },
+        "required": [
+          "metric",
+          "limit",
+          "period"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "$ref": "../common.schema.json#/$defs/short_text"
+      }
+    },
+    "valid_from": {
+      "$ref": "../common.schema.json#/$defs/nullable_date"
+    },
+    "valid_to": {
+      "$ref": "../common.schema.json#/$defs/nullable_date"
+    },
+    "pricing_model": {
+      "enum": [
+        "fixed",
+        "starting_at",
+        "custom",
+        "free"
+      ]
+    },
+    "audience": {
+      "enum": [
+        "insurers",
+        "consumers"
+      ]
+    }
+  },
+  "required": [
+    "tier_id",
+    "product_id",
+    "tier_name",
+    "tier_rank",
+    "monthly_list_price",
+    "price_unit",
+    "included_capacity",
+    "features",
+    "valid_from",
+    "valid_to",
+    "pricing_model",
+    "audience"
+  ],
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "tenant_id": "T-INSURELLM",
+      "source_system": "pm",
+      "sensitivity_label": "public",
+      "record_status": "active",
+      "created_at": "2024-01-01T09:00:00Z",
+      "updated_at": "2024-01-01T09:00:00Z",
+      "tier_id": "TIER-005",
+      "product_id": "PROD-002",
+      "tier_name": "Professional",
+      "tier_rank": 2,
+      "monthly_list_price": {
+        "amount": 2500,
+        "currency": "USD"
+      },
+      "price_unit": "per_month",
+      "included_capacity": [],
+      "features": [
+        "All Basic Tier features",
+        "Advanced analytics",
+        "Fraud detection"
+      ],
+      "valid_from": "2024-01-01",
+      "valid_to": null,
+      "pricing_model": "fixed",
+      "audience": "insurers",
+      "origin": "kb_seed"
+    }
+  ]
+}

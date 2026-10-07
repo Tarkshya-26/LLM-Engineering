@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/access_control/membership.schema.json",
+  "title": "Group membership",
+  "description": "A time-bounded fact: principal P was in group G from valid_from to valid_to. access_control/memberships.jsonl. A move between departments closes one membership and opens another; both rows stay, so decisions can be replayed as of any date.",
+  "type": "object",
+  "properties": {
+    "schema_version": { "$ref": "../common.schema.json#/$defs/schema_version" },
+    "membership_id": { "$ref": "../common.schema.json#/$defs/membership_id" },
+    "principal_id": { "$ref": "../common.schema.json#/$defs/principal_id" },
+    "group_id": { "$ref": "../common.schema.json#/$defs/group_id" },
+    "membership_role": { "enum": ["member", "owner"] },
+    "valid_from": { "$ref": "../common.schema.json#/$defs/date" },
+    "valid_to": { "$ref": "../common.schema.json#/$defs/nullable_date", "description": "Last day of membership, inclusive. Null = open-ended." },
+    "granted_by": { "$ref": "../common.schema.json#/$defs/principal_id" },
+    "grant_reason": { "enum": ["department_default", "role_based", "project_access", "temporary_access", "service_binding"] }
+  },
+  "required": ["schema_version", "membership_id", "principal_id", "group_id", "membership_role", "valid_from", "valid_to", "granted_by", "grant_reason"],
+  "additionalProperties": false,
+  "examples": [{
+    "schema_version": "1.0", "membership_id": "MEM-00117", "principal_id": "P-EMP-036", "group_id": "GRP-sales",
+    "membership_role": "member", "valid_from": "2023-02-01", "valid_to": null, "granted_by": "P-EMP-050", "grant_reason": "department_default"
+  }]
+}

@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/entities/customer.schema.json",
+  "title": "Customer",
+  "description": "A client organisation (fictional). entities/customers.jsonl. System of record: crm. The account team is a field here so every access edge is derived from a source row; changes to it arrive as CDC updates.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common.schema.json#/$defs/record_envelope"
+    },
+    {
+      "if": {
+        "properties": {
+          "has_portal_tenant": {
+            "const": true
+          }
+        },
+        "required": [
+          "has_portal_tenant"
+        ]
+      },
+      "then": {
+        "properties": {
+          "portal_tenant_id": {
+            "type": "string",
+            "pattern": "^T-CUST-\\d{3}$"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "portal_tenant_id": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "origin": {
+            "const": "generated"
+          }
+        },
+        "required": [
+          "origin"
+        ]
+      },
+      "then": {
+        "properties": {
+          "hq_city": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "country": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "region": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "customer_since": {
+            "not": {
+              "type": "null"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "customer_id": {
+      "$ref": "../common.schema.json#/$defs/customer_id"
+    },
+    "tenant_id": {
+      "const": "T-INSURELLM",
+      "description": "The CRM row itself is internal data, even for customers that also have a portal tenant."
+    },
+    "source_system": {
+      "const": "crm"
+    },
+    "legal_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "segment": {
+      "enum": [
+        "auto_insurer",
+        "home_insurer",
+        "life_insurer",
+        "health_insurer",
+        "commercial_insurer",
+        "reinsurer",
+        "claims_services",
+        "agency_broker",
+        "multi_line_insurer"
+      ]
+    },
+    "hq_city": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "country": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[A-Z]{2}$"
+    },
+    "region": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/region"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "account_manager_id": {
+      "$ref": "../common.schema.json#/$defs/employee_id"
+    },
+    "customer_success_manager_id": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/employee_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "account_team_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "../common.schema.json#/$defs/employee_id"
+      },
+      "description": "Everyone on the account team, including the account manager and CSM. Drives the account_team_of relation rule."
+    },
+    "customer_since": {
+      "$ref": "../common.schema.json#/$defs/nullable_date"
+    },
+    "customer_status": {
+      "enum": [
+        "prospect",
+        "active",
+        "churned"
+      ]
+    },
+    "has_portal_tenant": {
+      "type": "boolean"
+    },
+    "portal_tenant_id": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/tenant_id"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "T-CUST-nnn where nnn equals this customer's number (validator invariant)."
+    },
+    "is_public_reference": {
+      "type": "boolean",
+      "description": "True if Insurellm may name this customer publicly (press releases, website)."
+    }
+  },
+  "required": [
+    "customer_id",
+    "legal_name",
+    "display_name",
+    "segment",
+    "hq_city",
+    "country",
+    "region",
+    "account_manager_id",
+    "customer_success_manager_id",
+    "account_team_ids",
+    "customer_since",
+    "customer_status",
+    "has_portal_tenant",
+    "portal_tenant_id",
+    "is_public_reference"
+  ],
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "tenant_id": "T-INSURELLM",
+      "source_system": "crm",
+      "sensitivity_label": "confidential",
+      "record_status": "active",
+      "created_at": "2025-04-02T09:00:00Z",
+      "updated_at": "2025-05-10T09:00:00Z",
+      "customer_id": "CUST-012",
+      "legal_name": "FastTrack Insurance Services LLC",
+      "display_name": "FastTrack Insurance Services",
+      "segment": "claims_services",
+      "hq_city": "Atlanta",
+      "country": "US",
+      "region": "us",
+      "account_manager_id": "EMP-033",
+      "customer_success_manager_id": "EMP-037",
+      "account_team_ids": [
+        "EMP-033",
+        "EMP-037",
+        "EMP-061"
+      ],
+      "customer_since": "2025-05-10",
+      "customer_status": "active",
+      "has_portal_tenant": true,
+      "portal_tenant_id": "T-CUST-012",
+      "is_public_reference": false,
+      "origin": "generated"
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/ground_truth/checkpoint.schema.json",
+  "title": "Replay checkpoint",
+  "description": "What a correct index must look like after a batch has been applied. ground_truth/checkpoints.jsonl, one row per batch (CP-T0, CP-B01, ...). Tests incremental updates, stale vectors, delete propagation and idempotency.",
+  "type": "object",
+  "properties": {
+    "schema_version": { "$ref": "../common.schema.json#/$defs/schema_version" },
+    "checkpoint_id": { "$ref": "../common.schema.json#/$defs/checkpoint_id" },
+    "batch_id": { "$ref": "../common.schema.json#/$defs/batch_id" },
+    "as_of": { "$ref": "../common.schema.json#/$defs/datetime" },
+    "document_states": {
+      "type": "array", "minItems": 1,
+      "description": "Every document version that exists in the source at as_of.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "document_version_id": { "$ref": "../common.schema.json#/$defs/document_version_id" },
+          "status": { "$ref": "../common.schema.json#/$defs/document_status" },
+          "content_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "must_be_indexed": { "type": "boolean", "description": "False for deleted versions: no vectors may remain." },
+          "default_retrievable": { "type": "boolean", "description": "True only for current versions (lifecycle_visibility)." }
+        },
+        "required": ["document_version_id", "status", "content_sha256", "must_be_indexed", "default_retrievable"],
+        "additionalProperties": false,
+        "allOf": [
+          { "if": { "properties": { "status": { "const": "deleted" } } }, "then": { "properties": { "must_be_indexed": { "const": false }, "default_retrievable": { "const": false } } } },
+          { "if": { "properties": { "status": { "enum": ["superseded", "archived"] } } }, "then": { "properties": { "default_retrievable": { "const": false } } } }
+        ]
+      }
+    },
+    "cdc_anomalies": {
+      "type": "array",
+      "description": "Deliberately malformed deliveries in this batch, and what a correct consumer does.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "event_id": { "$ref": "../common.schema.json#/$defs/event_id" },
+          "anomaly_type": { "enum": ["duplicate_delivery", "out_of_order"] },
+          "expected_handling": { "enum": ["ignore_redelivery", "apply_in_sequence_order", "discard_stale_update"] },
+          "description": { "$ref": "../common.schema.json#/$defs/short_text" }
+        },
+        "required": ["event_id", "anomaly_type", "expected_handling", "description"],
+        "additionalProperties": false
+      }
+    },
+    "expected_counts": {
+      "type": "object",
+      "properties": {
+        "documents_current": { "type": "integer", "minimum": 0 },
+        "documents_superseded": { "type": "integer", "minimum": 0 },
+        "documents_archived": { "type": "integer", "minimum": 0 },
+        "documents_deleted": { "type": "integer", "minimum": 0 },
+        "active_principals": { "type": "integer", "minimum": 0 }
+      },
+      "required": ["documents_current", "documents_superseded", "documents_archived", "documents_deleted", "active_principals"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["schema_version", "checkpoint_id", "batch_id", "as_of", "document_states", "cdc_anomalies", "expected_counts"],
+  "additionalProperties": false,
+  "examples": [{
+    "schema_version": "1.0", "checkpoint_id": "CP-B02", "batch_id": "BATCH-02", "as_of": "2025-09-30T23:59:59Z",
+    "document_states": [
+      { "document_version_id": "DOC-CLM-0031@v1", "status": "superseded", "content_sha256": "9b1d6c0a2e4f6a8c0e2a4c6e8a0c2e4a6c8e0a2c4e6a8c0e2a4c6e8a0c2e4a6c", "must_be_indexed": true, "default_retrievable": false },
+      { "document_version_id": "DOC-CLM-0031@v2", "status": "current", "content_sha256": "3f9a1c0d5b7e2a4c6e8f0a1b3c5d7e9f1a2b4c6d8e0f1a3b5c7d9e1f2a4b6c8d", "must_be_indexed": true, "default_retrievable": true }
+    ],
+    "cdc_anomalies": [
+      { "event_id": "EVT-000187", "anomaly_type": "duplicate_delivery", "expected_handling": "ignore_redelivery", "description": "CON-031@v2 insert delivered twice." }
+    ],
+    "expected_counts": { "documents_current": 371, "documents_superseded": 14, "documents_archived": 3, "documents_deleted": 0, "active_principals": 74 }
+  }]
+}

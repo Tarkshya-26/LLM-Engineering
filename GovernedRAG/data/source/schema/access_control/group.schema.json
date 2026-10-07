@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/access_control/group.schema.json",
+  "title": "Group",
+  "description": "A named set of principals that documents grant access to. access_control/groups.jsonl. No nested groups in v1: membership is always direct.",
+  "type": "object",
+  "properties": {
+    "schema_version": { "$ref": "../common.schema.json#/$defs/schema_version" },
+    "group_id": { "$ref": "../common.schema.json#/$defs/group_id" },
+    "name": { "type": "string", "minLength": 1 },
+    "group_type": {
+      "enum": ["department", "functional", "restricted", "service"],
+      "description": "department = everyone in a department (GRP-finance). functional = cross-department role (GRP-support). restricted = small, audited (GRP-hr-comp, GRP-security-ir, GRP-board). service = for service accounts."
+    },
+    "tenant_id": { "const": "T-INSURELLM", "description": "Groups are internal. Customer users get access through their tenant, not groups." },
+    "department_id": { "anyOf": [{ "$ref": "../common.schema.json#/$defs/department_id" }, { "type": "null" }] },
+    "owner_principal_id": { "$ref": "../common.schema.json#/$defs/principal_id" },
+    "description": { "$ref": "../common.schema.json#/$defs/short_text" },
+    "max_label": { "$ref": "../common.schema.json#/$defs/sensitivity_label", "description": "Highest label this group may be granted on. A grant above it is a data error the validator rejects." },
+    "group_status": { "enum": ["active", "retired"] },
+    "created_at": { "$ref": "../common.schema.json#/$defs/datetime" }
+  },
+  "required": ["schema_version", "group_id", "name", "group_type", "tenant_id", "department_id", "owner_principal_id", "description", "max_label", "group_status", "created_at"],
+  "additionalProperties": false,
+  "allOf": [{
+    "if": { "properties": { "group_type": { "const": "department" } }, "required": ["group_type"] },
+    "then": { "properties": { "department_id": { "$ref": "../common.schema.json#/$defs/department_id" } } }
+  }],
+  "examples": [{
+    "schema_version": "1.0", "group_id": "GRP-hr-comp", "name": "HR Compensation", "group_type": "restricted", "tenant_id": "T-INSURELLM",
+    "department_id": "DEPT-06", "owner_principal_id": "P-EMP-050", "description": "People who administer pay. Only group granted on compensation records.",
+    "max_label": "restricted", "group_status": "active", "created_at": "2019-01-07T09:00:00Z"
+  }]
+}

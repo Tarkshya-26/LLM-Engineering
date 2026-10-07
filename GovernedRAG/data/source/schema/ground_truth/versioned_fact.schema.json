@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/ground_truth/versioned_fact.schema.json",
+  "title": "Versioned fact",
+  "description": "One fact with the period it was true, traced to the source row and the documents that state it. ground_truth/versioned_facts.jsonl. Powers temporal, freshness and version-aware evaluation: the right answer to 'what is X?' depends on the as-of date.",
+  "type": "object",
+  "properties": {
+    "schema_version": { "$ref": "../common.schema.json#/$defs/schema_version" },
+    "fact_id": { "$ref": "../common.schema.json#/$defs/fact_id" },
+    "subject_entity_id": { "$ref": "../common.schema.json#/$defs/entity_ref" },
+    "attribute": { "$ref": "../common.schema.json#/$defs/snake_case", "description": "e.g. monthly_fee, user_licenses, term_end, tech_lead, base_salary." },
+    "value": { "type": ["string", "number", "integer", "boolean"] },
+    "value_type": { "enum": ["string", "integer", "number", "boolean", "date", "money", "entity_ref"] },
+    "unit": { "type": ["string", "null"] },
+    "currency": { "anyOf": [{ "$ref": "../common.schema.json#/$defs/currency" }, { "type": "null" }] },
+    "valid_from": { "$ref": "../common.schema.json#/$defs/date" },
+    "valid_to": { "$ref": "../common.schema.json#/$defs/nullable_date", "description": "Null = still true at the end of the last batch." },
+    "introduced_in_batch": { "$ref": "../common.schema.json#/$defs/batch_id" },
+    "superseded_by_fact_id": { "anyOf": [{ "$ref": "../common.schema.json#/$defs/fact_id" }, { "type": "null" }] },
+    "source_record": {
+      "type": "object",
+      "properties": {
+        "entity_type": { "type": "string", "pattern": "^[a-z_]+$" },
+        "record_id": { "$ref": "../common.schema.json#/$defs/entity_ref" },
+        "field_path": { "type": "string", "pattern": "^[a-z_]+(\\[[0-9]+\\])?(\\.[a-z_]+(\\[[0-9]+\\])?)*$", "description": "e.g. monthly_fee.amount or volume_commitments[0].value" }
+      },
+      "required": ["entity_type", "record_id", "field_path"],
+      "additionalProperties": false
+    },
+    "evidence_document_versions": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": { "$ref": "../common.schema.json#/$defs/document_version_id" },
+      "description": "Every document version whose body states this fact."
+    },
+    "min_label_to_know": {
+      "$ref": "../common.schema.json#/$defs/sensitivity_label",
+      "description": "The LEAST restrictive label among the evidence documents. If a fact is in a public press release and a confidential contract, this is public, and refusing it is over-blocking."
+    },
+    "question_categories": {
+      "type": "array", "uniqueItems": true,
+      "items": { "enum": ["direct_fact", "numerical", "temporal", "relationship", "spanning", "holistic", "comparative", "governance"] }
+    }
+  },
+  "required": ["schema_version", "fact_id", "subject_entity_id", "attribute", "value", "value_type", "unit", "currency", "valid_from",
+    "valid_to", "introduced_in_batch", "superseded_by_fact_id", "source_record", "evidence_document_versions", "min_label_to_know", "question_categories"],
+  "additionalProperties": false,
+  "allOf": [{
+    "if": { "properties": { "value_type": { "const": "money" } }, "required": ["value_type"] },
+    "then": { "properties": { "value": { "type": "number" }, "currency": { "$ref": "../common.schema.json#/$defs/currency" } } }
+  }],
+  "examples": [{
+    "schema_version": "1.0", "fact_id": "FACT-00318", "subject_entity_id": "CON-031", "attribute": "monthly_fee", "value": 9500,
+    "value_type": "money", "unit": "per_month", "currency": "USD", "valid_from": "2025-05-10", "valid_to": "2025-08-31",
+    "introduced_in_batch": "BATCH-00", "superseded_by_fact_id": "FACT-00911",
+    "source_record": { "entity_type": "contract_version", "record_id": "CON-031@v1", "field_path": "monthly_fee.amount" },
+    "evidence_document_versions": ["DOC-CLM-0031@v1"], "min_label_to_know": "confidential", "question_categories": ["numerical", "temporal"]
+  }]
+}

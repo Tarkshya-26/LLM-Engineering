@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/entities/team.schema.json",
+  "title": "Team",
+  "description": "A team inside one department. entities/teams.jsonl. System of record: hris.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common.schema.json#/$defs/record_envelope"
+    }
+  ],
+  "properties": {
+    "team_id": {
+      "$ref": "../common.schema.json#/$defs/team_id"
+    },
+    "tenant_id": {
+      "const": "T-INSURELLM"
+    },
+    "source_system": {
+      "const": "hris"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "department_id": {
+      "$ref": "../common.schema.json#/$defs/department_id"
+    },
+    "lead_employee_id": {
+      "$ref": "../common.schema.json#/$defs/employee_id"
+    },
+    "primary_location_id": {
+      "$ref": "../common.schema.json#/$defs/location_id"
+    },
+    "owned_product_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "../common.schema.json#/$defs/product_id"
+      },
+      "description": "Products this team builds or runs. Empty for non-product teams."
+    }
+  },
+  "required": [
+    "team_id",
+    "name",
+    "department_id",
+    "lead_employee_id",
+    "primary_location_id",
+    "owned_product_ids"
+  ],
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "tenant_id": "T-INSURELLM",
+      "source_system": "hris",
+      "sensitivity_label": "internal",
+      "record_status": "active",
+      "created_at": "2019-02-01T09:00:00Z",
+      "updated_at": "2025-01-10T09:00:00Z",
+      "team_id": "TEAM-03",
+      "name": "Claims Platform",
+      "department_id": "DEPT-02",
+      "lead_employee_id": "EMP-012",
+      "primary_location_id": "LOC-02",
+      "owned_product_ids": [
+        "PROD-007"
+      ],
+      "origin": "generated"
+    }
+  ]
+}

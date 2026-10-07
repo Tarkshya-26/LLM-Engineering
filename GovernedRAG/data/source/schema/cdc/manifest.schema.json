@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/cdc/manifest.schema.json",
+  "title": "CDC manifest",
+  "description": "cdc/manifest.json. Declares the T0 snapshot and the change batches that follow. Replay = load the snapshot, then apply events of each batch in delivery order.",
+  "type": "object",
+  "properties": {
+    "schema_version": { "$ref": "../common.schema.json#/$defs/schema_version" },
+    "dataset_version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "generated_at": { "$ref": "../common.schema.json#/$defs/datetime" },
+    "generator_seed": { "type": "integer", "description": "Seed used by the generator, so the world can be rebuilt bit-for-bit." },
+    "t0_snapshot_at": { "$ref": "../common.schema.json#/$defs/datetime", "description": "As-of time of entities/, access_control/ and every document version whose updated_at <= this time." },
+    "batches": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "batch_id": { "$ref": "../common.schema.json#/$defs/batch_id" },
+          "label": { "type": "string", "minLength": 1 },
+          "scenario": { "enum": ["t0_snapshot", "new_business", "amendments_and_price_changes", "access_changes", "archival_and_deletion", "policy_revisions", "mixed"] },
+          "starts_at": { "$ref": "../common.schema.json#/$defs/datetime" },
+          "ends_at": { "$ref": "../common.schema.json#/$defs/datetime" },
+          "event_count": { "type": "integer", "minimum": 0, "description": "Events as delivered, including deliberate redeliveries." },
+          "checkpoint_id": { "$ref": "../common.schema.json#/$defs/checkpoint_id" }
+        },
+        "required": ["batch_id", "label", "scenario", "starts_at", "ends_at", "event_count", "checkpoint_id"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["schema_version", "dataset_version", "generated_at", "generator_seed", "t0_snapshot_at", "batches"],
+  "additionalProperties": false,
+  "examples": [{
+    "schema_version": "1.0", "dataset_version": "1.0.0", "generated_at": "2026-10-07T12:00:00Z", "generator_seed": 20251006,
+    "t0_snapshot_at": "2025-06-30T23:59:59Z",
+    "batches": [
+      { "batch_id": "BATCH-00", "label": "Initial load", "scenario": "t0_snapshot", "starts_at": "2025-06-30T23:59:59Z", "ends_at": "2025-06-30T23:59:59Z", "event_count": 0, "checkpoint_id": "CP-T0" },
+      { "batch_id": "BATCH-01", "label": "Q3 new business", "scenario": "new_business", "starts_at": "2025-07-01T00:00:00Z", "ends_at": "2025-08-15T23:59:59Z", "event_count": 64, "checkpoint_id": "CP-B01" }
+    ]
+  }]
+}

@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/entities/policy.schema.json",
+  "title": "Policy (header)",
+  "description": "A company policy's stable identity (e.g. Remote Work Policy). The text of each revision is a policy_version. entities/policies.jsonl. System of record: grc.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common.schema.json#/$defs/record_envelope"
+    }
+  ],
+  "properties": {
+    "policy_id": {
+      "$ref": "../common.schema.json#/$defs/policy_id"
+    },
+    "tenant_id": {
+      "const": "T-INSURELLM"
+    },
+    "source_system": {
+      "const": "grc"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "policy_area": {
+      "enum": [
+        "security",
+        "privacy",
+        "hr",
+        "finance",
+        "legal",
+        "it",
+        "operations"
+      ]
+    },
+    "owner_department_id": {
+      "$ref": "../common.schema.json#/$defs/department_id"
+    },
+    "owner_employee_id": {
+      "$ref": "../common.schema.json#/$defs/employee_id"
+    },
+    "current_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "review_cycle_months": {
+      "type": "integer",
+      "enum": [
+        6,
+        12,
+        24
+      ]
+    },
+    "applies_to": {
+      "enum": [
+        "all_employees",
+        "engineering",
+        "customer_facing",
+        "finance",
+        "managers",
+        "contractors"
+      ]
+    }
+  },
+  "required": [
+    "policy_id",
+    "title",
+    "policy_area",
+    "owner_department_id",
+    "owner_employee_id",
+    "current_version",
+    "review_cycle_months",
+    "applies_to"
+  ],
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "tenant_id": "T-INSURELLM",
+      "source_system": "grc",
+      "sensitivity_label": "internal",
+      "record_status": "active",
+      "created_at": "2020-03-16T09:00:00Z",
+      "updated_at": "2025-08-01T09:00:00Z",
+      "policy_id": "POL-008",
+      "title": "Remote Work Policy",
+      "policy_area": "hr",
+      "owner_department_id": "DEPT-06",
+      "owner_employee_id": "EMP-050",
+      "current_version": 2,
+      "review_cycle_months": 12,
+      "applies_to": "all_employees",
+      "origin": "generated"
+    }
+  ]
+}

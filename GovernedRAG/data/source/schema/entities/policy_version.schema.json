@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/entities/policy_version.schema.json",
+  "title": "Policy version",
+  "description": "One approved revision of a policy. entities/policy_versions.jsonl. System of record: grc.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common.schema.json#/$defs/record_envelope"
+    },
+    {
+      "if": {
+        "properties": {
+          "version": {
+            "const": 1
+          }
+        },
+        "required": [
+          "version"
+        ]
+      },
+      "then": {
+        "properties": {
+          "supersedes": {
+            "type": "null"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "supersedes": {
+            "$ref": "../common.schema.json#/$defs/policy_version_id"
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "policy_version_id": {
+      "$ref": "../common.schema.json#/$defs/policy_version_id"
+    },
+    "tenant_id": {
+      "const": "T-INSURELLM"
+    },
+    "source_system": {
+      "const": "grc"
+    },
+    "policy_id": {
+      "$ref": "../common.schema.json#/$defs/policy_id"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "supersedes": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/policy_version_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "version_status": {
+      "enum": [
+        "current",
+        "superseded",
+        "retired"
+      ]
+    },
+    "effective_from": {
+      "$ref": "../common.schema.json#/$defs/date"
+    },
+    "effective_to": {
+      "$ref": "../common.schema.json#/$defs/nullable_date"
+    },
+    "approved_by": {
+      "$ref": "../common.schema.json#/$defs/employee_id"
+    },
+    "key_rules": {
+      "type": "array",
+      "description": "The quantified rules the policy text states (e.g. remote_days_per_week = 3). A v2 changes at least one.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "rule": {
+            "$ref": "../common.schema.json#/$defs/snake_case"
+          },
+          "value": {
+            "type": [
+              "number",
+              "string",
+              "boolean"
+            ]
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "rule",
+          "value",
+          "unit"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "change_summary": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/short_text"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "policy_version_id",
+    "policy_id",
+    "version",
+    "supersedes",
+    "version_status",
+    "effective_from",
+    "effective_to",
+    "approved_by",
+    "key_rules",
+    "change_summary"
+  ],
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "tenant_id": "T-INSURELLM",
+      "source_system": "grc",
+      "sensitivity_label": "internal",
+      "record_status": "active",
+      "created_at": "2025-08-01T09:00:00Z",
+      "updated_at": "2025-08-01T09:00:00Z",
+      "policy_version_id": "POL-008@v2",
+      "policy_id": "POL-008",
+      "version": 2,
+      "supersedes": "POL-008@v1",
+      "version_status": "current",
+      "effective_from": "2025-09-01",
+      "effective_to": null,
+      "approved_by": "EMP-001",
+      "key_rules": [
+        {
+          "rule": "remote_days_per_week",
+          "value": 2,
+          "unit": "days"
+        }
+      ],
+      "change_summary": "Remote days per week reduced from 3 to 2.",
+      "origin": "generated"
+    }
+  ]
+}

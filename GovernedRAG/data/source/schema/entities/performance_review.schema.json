@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/entities/performance_review.schema.json",
+  "title": "Performance review",
+  "description": "One annual review for one employee. entities/performance_reviews.jsonl. System of record: hris. Always confidential (hr, the manager chain via manager_of, and the employee via self).",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common.schema.json#/$defs/record_envelope"
+    },
+    {
+      "if": {
+        "properties": {
+          "origin": {
+            "const": "generated"
+          }
+        },
+        "required": [
+          "origin"
+        ]
+      },
+      "then": {
+        "properties": {
+          "reviewer_id": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "finalized_on": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "rating_label": {
+            "not": {
+              "type": "null"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "review_id": {
+      "$ref": "../common.schema.json#/$defs/review_id"
+    },
+    "tenant_id": {
+      "const": "T-INSURELLM"
+    },
+    "source_system": {
+      "const": "hris"
+    },
+    "sensitivity_label": {
+      "const": "confidential"
+    },
+    "employee_id": {
+      "$ref": "../common.schema.json#/$defs/employee_id"
+    },
+    "review_year": {
+      "type": "integer",
+      "minimum": 2015,
+      "maximum": 2030
+    },
+    "reviewer_id": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/employee_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "highlight_codes": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "../common.schema.json#/$defs/snake_case"
+      },
+      "description": "Machine tags for themes the review prose covers, e.g. led_migration, missed_deadlines."
+    },
+    "metrics": {
+      "type": "array",
+      "description": "Quantified achievements quoted in the review text (e.g. 30 percent faster retrieval). Every number in the review document comes from here.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "../common.schema.json#/$defs/snake_case"
+          },
+          "value": {
+            "type": "number"
+          },
+          "unit": {
+            "enum": [
+              "percent",
+              "count",
+              "usd",
+              "days",
+              "hours"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "value",
+          "unit"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "finalized_on": {
+      "$ref": "../common.schema.json#/$defs/nullable_date"
+    },
+    "rating_label": {
+      "enum": [
+        "Outstanding",
+        "Exceptional",
+        "Exceeds Expectations",
+        "Meets Expectations",
+        "Satisfactory",
+        "Developing",
+        "Needs Improvement",
+        "Below Expectations",
+        "Unsatisfactory",
+        null
+      ]
+    },
+    "rating_score": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 5,
+      "description": "Score out of 5, as the KB writes it (e.g. 4.5/5)."
+    }
+  },
+  "required": [
+    "review_id",
+    "employee_id",
+    "review_year",
+    "reviewer_id",
+    "rating_label",
+    "rating_score",
+    "highlight_codes",
+    "metrics",
+    "finalized_on"
+  ],
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "tenant_id": "T-INSURELLM",
+      "source_system": "hris",
+      "sensitivity_label": "confidential",
+      "record_status": "active",
+      "created_at": "2022-01-20T09:00:00Z",
+      "updated_at": "2022-01-20T09:00:00Z",
+      "review_id": "PRV-0088",
+      "employee_id": "EMP-021",
+      "review_year": 2021,
+      "reviewer_id": "EMP-005",
+      "highlight_codes": [
+        "led_warehouse_migration"
+      ],
+      "metrics": [
+        {
+          "name": "retrieval_time_improvement",
+          "value": 30,
+          "unit": "percent"
+        }
+      ],
+      "finalized_on": "2022-01-20",
+      "rating_label": "Exceeds Expectations",
+      "rating_score": null,
+      "origin": "generated"
+    }
+  ]
+}

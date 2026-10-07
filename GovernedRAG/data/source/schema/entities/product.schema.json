@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/entities/product.schema.json",
+  "title": "Product",
+  "description": "An Insurellm product line (Carllm, Homellm, ...). Prices live in product_tier. entities/products.jsonl. System of record: pm.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common.schema.json#/$defs/record_envelope"
+    },
+    {
+      "if": {
+        "properties": {
+          "lifecycle_status": {
+            "const": "retired"
+          }
+        },
+        "required": [
+          "lifecycle_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "retired_on": {
+            "$ref": "../common.schema.json#/$defs/date"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "retired_on": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "origin": {
+            "const": "generated"
+          }
+        },
+        "required": [
+          "origin"
+        ]
+      },
+      "then": {
+        "properties": {
+          "launch_date": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "launch_order": {
+            "not": {
+              "type": "null"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "product_id": {
+      "$ref": "../common.schema.json#/$defs/product_id"
+    },
+    "tenant_id": {
+      "const": "T-INSURELLM"
+    },
+    "source_system": {
+      "const": "pm"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Za-z]+$"
+    },
+    "category": {
+      "enum": [
+        "auto",
+        "home",
+        "life",
+        "health",
+        "commercial",
+        "claims",
+        "reinsurance",
+        "marketplace"
+      ]
+    },
+    "tagline": {
+      "$ref": "../common.schema.json#/$defs/short_text"
+    },
+    "launch_date": {
+      "$ref": "../common.schema.json#/$defs/nullable_date"
+    },
+    "launch_order": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1,
+      "description": "1 = Insurellm's first product. Null where the KB does not say."
+    },
+    "lifecycle_status": {
+      "enum": [
+        "active",
+        "sunset",
+        "retired"
+      ]
+    },
+    "retired_on": {
+      "$ref": "../common.schema.json#/$defs/nullable_date"
+    },
+    "tech_lead_id": {
+      "$ref": "../common.schema.json#/$defs/employee_id"
+    },
+    "product_owner_id": {
+      "$ref": "../common.schema.json#/$defs/employee_id"
+    },
+    "design_lead_id": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/employee_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "owning_team_id": {
+      "$ref": "../common.schema.json#/$defs/team_id"
+    },
+    "roadmap_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "feature": {
+            "$ref": "../common.schema.json#/$defs/short_text"
+          },
+          "target_quarter": {
+            "type": "string",
+            "pattern": "^\\d{4}(-Q[1-4])?$",
+            "description": "'2025-Q2', or '2026' when the source gives only a year."
+          }
+        },
+        "required": [
+          "feature",
+          "target_quarter"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "product_id",
+    "name",
+    "category",
+    "tagline",
+    "launch_date",
+    "launch_order",
+    "lifecycle_status",
+    "retired_on",
+    "tech_lead_id",
+    "product_owner_id",
+    "design_lead_id",
+    "owning_team_id",
+    "roadmap_items"
+  ],
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "tenant_id": "T-INSURELLM",
+      "source_system": "pm",
+      "sensitivity_label": "internal",
+      "record_status": "active",
+      "created_at": "2018-04-01T09:00:00Z",
+      "updated_at": "2025-03-01T09:00:00Z",
+      "product_id": "PROD-002",
+      "name": "Carllm",
+      "category": "auto",
+      "tagline": "AI-powered auto insurance underwriting and pricing.",
+      "launch_date": "2018-04-01",
+      "launch_order": 2,
+      "lifecycle_status": "active",
+      "retired_on": null,
+      "tech_lead_id": "EMP-014",
+      "product_owner_id": "EMP-030",
+      "design_lead_id": null,
+      "owning_team_id": "TEAM-02",
+      "roadmap_items": [
+        {
+          "feature": "Telematics-based pricing",
+          "target_quarter": "2025-Q2"
+        }
+      ],
+      "origin": "generated"
+    }
+  ]
+}

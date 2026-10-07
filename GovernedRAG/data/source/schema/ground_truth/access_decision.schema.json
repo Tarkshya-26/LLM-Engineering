@@ -1,0 +1,208 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/ground_truth/access_decision.schema.json",
+  "title": "Ground-truth access decision",
+  "description": "The correct authorization answer for one (persona, document version, checkpoint). ground_truth/access_matrix.jsonl. Computed by the generator from policies.yaml, memberships and edges; your engine is scored against it. Covers every persona x every document version x every checkpoint.",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "$ref": "../common.schema.json#/$defs/schema_version"
+    },
+    "decision_id": {
+      "$ref": "../common.schema.json#/$defs/decision_id"
+    },
+    "checkpoint_id": {
+      "$ref": "../common.schema.json#/$defs/checkpoint_id"
+    },
+    "persona_id": {
+      "$ref": "../common.schema.json#/$defs/persona_id"
+    },
+    "principal_id": {
+      "$ref": "../common.schema.json#/$defs/principal_id"
+    },
+    "document_version_id": {
+      "$ref": "../common.schema.json#/$defs/document_version_id"
+    },
+    "decision": {
+      "enum": [
+        "allow",
+        "deny"
+      ]
+    },
+    "decided_at_step": {
+      "enum": [
+        "global_deny",
+        "tenant",
+        "label",
+        "grant"
+      ]
+    },
+    "reason_code": {
+      "enum": [
+        "allow_public_label",
+        "allow_internal_label",
+        "allow_group_grant",
+        "allow_relation_grant",
+        "allow_principal_grant",
+        "allow_tenant_membership",
+        "deny_principal_not_active",
+        "deny_document_deleted",
+        "deny_tenant_not_active",
+        "deny_tenant_isolation",
+        "deny_public_only",
+        "deny_principal_type_for_label",
+        "deny_relation_not_allowed_for_label",
+        "deny_no_matching_grant",
+        "deny_history_exceeds_current"
+      ],
+      "description": "deny_history_exceeds_current = a superseded or archived version the principal could read on its own grants, denied because the CURRENT version's grants deny them (approved historical-version rule)."
+    },
+    "matched_grant": {
+      "description": "The first grant that matched, for allows decided at the grant step. Null otherwise.",
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "grant_type": {
+              "enum": [
+                "group",
+                "relation",
+                "principal",
+                "tenant_membership"
+              ]
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Group id, 'relation:subject' (e.g. account_team_of:CUST-012), principal id, or tenant id."
+            },
+            "via_membership_id": {
+              "anyOf": [
+                {
+                  "$ref": "../common.schema.json#/$defs/membership_id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "via_edge_ids": {
+              "type": "array",
+              "items": {
+                "$ref": "../common.schema.json#/$defs/edge_id"
+              }
+            }
+          },
+          "required": [
+            "grant_type",
+            "value",
+            "via_membership_id",
+            "via_edge_ids"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "policy_set_version": {
+      "type": "integer",
+      "minimum": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "decision_id",
+    "checkpoint_id",
+    "persona_id",
+    "principal_id",
+    "document_version_id",
+    "decision",
+    "decided_at_step",
+    "reason_code",
+    "matched_grant",
+    "policy_set_version"
+  ],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "const": "allow"
+          }
+        },
+        "required": [
+          "decision"
+        ]
+      },
+      "then": {
+        "properties": {
+          "reason_code": {
+            "pattern": "^allow_"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "reason_code": {
+            "pattern": "^deny_"
+          },
+          "matched_grant": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "reason_code": {
+            "enum": [
+              "allow_group_grant",
+              "allow_relation_grant",
+              "allow_principal_grant",
+              "allow_tenant_membership"
+            ]
+          }
+        },
+        "required": [
+          "reason_code"
+        ]
+      },
+      "then": {
+        "properties": {
+          "matched_grant": {
+            "type": "object"
+          },
+          "decided_at_step": {
+            "const": "grant"
+          }
+        }
+      }
+    }
+  ],
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "decision_id": "DEC-004211",
+      "checkpoint_id": "CP-T0",
+      "persona_id": "PERS-03",
+      "principal_id": "P-EMP-036",
+      "document_version_id": "DOC-CLM-0031@v1",
+      "decision": "allow",
+      "decided_at_step": "grant",
+      "reason_code": "allow_relation_grant",
+      "matched_grant": {
+        "grant_type": "relation",
+        "value": "account_team_of:CUST-012",
+        "via_membership_id": null,
+        "via_edge_ids": [
+          "EDGE-000980"
+        ]
+      },
+      "policy_set_version": 1
+    }
+  ]
+}

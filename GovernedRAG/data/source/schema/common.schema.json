@@ -1,0 +1,410 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/common.schema.json",
+  "title": "Insurellm source world: shared definitions",
+  "description": "Shared ID patterns, enums and building blocks. Every other schema references these $defs. Nothing here is a standalone record.",
+  "$defs": {
+    "schema_version": {
+      "description": "Version of these source schemas. Bumped only with a migration note in README.",
+      "const": "1.0"
+    },
+    "tenant_id": {
+      "type": "string",
+      "pattern": "^T-(INSURELLM|CUST-\\d{3})$",
+      "description": "T-INSURELLM for all internal data; T-CUST-nnn for a customer's support-portal tenant (nnn matches the CUST id)."
+    },
+    "location_id": {
+      "type": "string",
+      "pattern": "^LOC-\\d{2}$"
+    },
+    "department_id": {
+      "type": "string",
+      "pattern": "^DEPT-\\d{2}$"
+    },
+    "team_id": {
+      "type": "string",
+      "pattern": "^TEAM-\\d{2}$"
+    },
+    "employee_id": {
+      "type": "string",
+      "pattern": "^EMP-\\d{3}$"
+    },
+    "compensation_id": {
+      "type": "string",
+      "pattern": "^COMP-\\d{4}$"
+    },
+    "review_id": {
+      "type": "string",
+      "pattern": "^PRV-\\d{4}$"
+    },
+    "product_id": {
+      "type": "string",
+      "pattern": "^PROD-\\d{3}$"
+    },
+    "tier_id": {
+      "type": "string",
+      "pattern": "^TIER-\\d{3}$"
+    },
+    "customer_id": {
+      "type": "string",
+      "pattern": "^CUST-\\d{3}$"
+    },
+    "contract_id": {
+      "type": "string",
+      "pattern": "^CON-\\d{3}$"
+    },
+    "contract_version_id": {
+      "type": "string",
+      "pattern": "^CON-\\d{3}@v[1-9]\\d*$",
+      "description": "contract_id + '@v' + version, e.g. CON-031@v2."
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^PROJ-\\d{3}$"
+    },
+    "policy_id": {
+      "type": "string",
+      "pattern": "^POL-\\d{3}$"
+    },
+    "policy_version_id": {
+      "type": "string",
+      "pattern": "^POL-\\d{3}@v[1-9]\\d*$"
+    },
+    "incident_id": {
+      "type": "string",
+      "pattern": "^INC-\\d{3}$"
+    },
+    "ticket_id": {
+      "type": "string",
+      "pattern": "^TCK-\\d{4}$"
+    },
+    "financial_id": {
+      "type": "string",
+      "pattern": "^FIN-\\d{3}$"
+    },
+    "document_id": {
+      "type": "string",
+      "pattern": "^DOC-(HRIS|CRM|CLM|ERP|WIKI|GRC|ITSM|PM|SUP|WEB)-\\d{4}$",
+      "description": "Stable across versions. The middle segment names the source system."
+    },
+    "document_version_id": {
+      "type": "string",
+      "pattern": "^DOC-(HRIS|CRM|CLM|ERP|WIKI|GRC|ITSM|PM|SUP|WEB)-\\d{4}@v[1-9]\\d*$"
+    },
+    "principal_id": {
+      "type": "string",
+      "pattern": "^P-(EMP-\\d{3}|CUS-\\d{4}|SVC-\\d{3})$",
+      "description": "P-EMP-nnn wraps an employee; P-CUS-nnnn is a customer portal user; P-SVC-nnn is a service account."
+    },
+    "group_id": {
+      "type": "string",
+      "pattern": "^GRP-[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "membership_id": {
+      "type": "string",
+      "pattern": "^MEM-\\d{5}$"
+    },
+    "edge_id": {
+      "type": "string",
+      "pattern": "^EDGE-\\d{6}$"
+    },
+    "event_id": {
+      "type": "string",
+      "pattern": "^EVT-\\d{6}$"
+    },
+    "batch_id": {
+      "type": "string",
+      "pattern": "^BATCH-\\d{2}$",
+      "description": "BATCH-00 is the T0 snapshot; BATCH-01.. are change batches after T0."
+    },
+    "policy_set_id": {
+      "type": "string",
+      "pattern": "^PSET-\\d{3}$"
+    },
+    "persona_id": {
+      "type": "string",
+      "pattern": "^PERS-\\d{2}$"
+    },
+    "fact_id": {
+      "type": "string",
+      "pattern": "^FACT-\\d{5}$"
+    },
+    "checkpoint_id": {
+      "type": "string",
+      "pattern": "^CP-(T0|B\\d{2})$"
+    },
+    "decision_id": {
+      "type": "string",
+      "pattern": "^DEC-\\d{6}$"
+    },
+    "annotation_id": {
+      "type": "string",
+      "pattern": "^ANN-\\d{4}$"
+    },
+    "entity_ref": {
+      "description": "Any entity or versioned-entity id. Used by subject_entities, edges and facts.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/location_id"
+        },
+        {
+          "$ref": "#/$defs/department_id"
+        },
+        {
+          "$ref": "#/$defs/team_id"
+        },
+        {
+          "$ref": "#/$defs/employee_id"
+        },
+        {
+          "$ref": "#/$defs/compensation_id"
+        },
+        {
+          "$ref": "#/$defs/review_id"
+        },
+        {
+          "$ref": "#/$defs/product_id"
+        },
+        {
+          "$ref": "#/$defs/tier_id"
+        },
+        {
+          "$ref": "#/$defs/customer_id"
+        },
+        {
+          "$ref": "#/$defs/contract_id"
+        },
+        {
+          "$ref": "#/$defs/contract_version_id"
+        },
+        {
+          "$ref": "#/$defs/project_id"
+        },
+        {
+          "$ref": "#/$defs/policy_id"
+        },
+        {
+          "$ref": "#/$defs/policy_version_id"
+        },
+        {
+          "$ref": "#/$defs/incident_id"
+        },
+        {
+          "$ref": "#/$defs/ticket_id"
+        },
+        {
+          "$ref": "#/$defs/financial_id"
+        },
+        {
+          "$ref": "#/$defs/tenant_id"
+        }
+      ]
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "datetime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "nullable_date": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/date"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullable_datetime": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/datetime"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "currency": {
+      "enum": [
+        "USD",
+        "GBP",
+        "EUR"
+      ]
+    },
+    "money": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "currency": {
+          "$ref": "#/$defs/currency"
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "additionalProperties": false
+    },
+    "source_system": {
+      "description": "The system of record that owns the data. Fictional internal systems, named by function.",
+      "enum": [
+        "hris",
+        "crm",
+        "clm",
+        "erp",
+        "wiki",
+        "grc",
+        "itsm",
+        "pm",
+        "support",
+        "public_web"
+      ]
+    },
+    "sensitivity_label": {
+      "description": "public < internal < confidential < restricted. Semantics live in access_control/policies.yaml.",
+      "enum": [
+        "public",
+        "internal",
+        "confidential",
+        "restricted"
+      ]
+    },
+    "region": {
+      "enum": [
+        "us",
+        "uk",
+        "eu"
+      ]
+    },
+    "language": {
+      "type": "string",
+      "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+    },
+    "record_status": {
+      "description": "Lifecycle of a structured entity row in its system of record.",
+      "enum": [
+        "active",
+        "inactive",
+        "deleted"
+      ]
+    },
+    "document_status": {
+      "description": "Lifecycle of one document version.",
+      "enum": [
+        "current",
+        "superseded",
+        "archived",
+        "deleted"
+      ]
+    },
+    "relation_rule": {
+      "description": "Relationship-based grants. Defined in access_control/policies.yaml.",
+      "enum": [
+        "self",
+        "manager_of",
+        "account_team_of"
+      ]
+    },
+    "snake_case": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "short_text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "reserved_ingestion_field": {
+      "description": "Field names owned by the ingestion pipeline (Phases 4-5). They must NEVER appear in source data. Source schemas reject them.",
+      "enum": [
+        "vector_id",
+        "chunk_id",
+        "chunk_index",
+        "chunk_count",
+        "chunk_hash",
+        "parent_chunk_id",
+        "char_start",
+        "char_end",
+        "token_count",
+        "embedding",
+        "embedding_model",
+        "embedding_version",
+        "embedding_dim",
+        "ingested_at",
+        "ingestion_run_id",
+        "pipeline_version",
+        "index_name",
+        "collection_name",
+        "acl_principal_hashes"
+      ]
+    },
+    "record_envelope": {
+      "description": "Fields every structured entity row carries, whatever its type.",
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "$ref": "#/$defs/schema_version"
+        },
+        "tenant_id": {
+          "$ref": "#/$defs/tenant_id"
+        },
+        "source_system": {
+          "$ref": "#/$defs/source_system"
+        },
+        "sensitivity_label": {
+          "$ref": "#/$defs/sensitivity_label"
+        },
+        "record_status": {
+          "$ref": "#/$defs/record_status"
+        },
+        "created_at": {
+          "$ref": "#/$defs/datetime"
+        },
+        "updated_at": {
+          "$ref": "#/$defs/datetime"
+        },
+        "origin": {
+          "$ref": "#/$defs/origin"
+        }
+      },
+      "required": [
+        "schema_version",
+        "tenant_id",
+        "source_system",
+        "sensitivity_label",
+        "record_status",
+        "created_at",
+        "updated_at",
+        "origin"
+      ],
+      "propertyNames": {
+        "not": {
+          "$ref": "#/$defs/reserved_ingestion_field"
+        }
+      }
+    },
+    "origin": {
+      "enum": [
+        "kb_seed",
+        "generated"
+      ],
+      "description": "kb_seed = extracted from the original knowledge base, with provenance in seed/kb_seed.json; may hold null where the KB is silent. generated = created by datagen; every field must be filled."
+    },
+    "date_precision": {
+      "enum": [
+        "day",
+        "month",
+        "year"
+      ],
+      "description": "How much of a date the source states. '2017-01-01' with precision 'month' means 'January 2017'."
+    }
+  }
+}

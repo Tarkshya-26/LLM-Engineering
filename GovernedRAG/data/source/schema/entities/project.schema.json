@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/entities/project.schema.json",
+  "title": "Project",
+  "description": "A tracked initiative. Includes one restricted acquisition project known only to executive, legal and finance. entities/projects.jsonl. System of record: pm.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common.schema.json#/$defs/record_envelope"
+    }
+  ],
+  "properties": {
+    "project_id": {
+      "$ref": "../common.schema.json#/$defs/project_id"
+    },
+    "tenant_id": {
+      "const": "T-INSURELLM"
+    },
+    "source_system": {
+      "const": "pm"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "codename": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Restricted projects are referred to by codename in any lower-label document."
+    },
+    "project_type": {
+      "enum": [
+        "product_feature",
+        "platform",
+        "data",
+        "security",
+        "compliance",
+        "go_to_market",
+        "corporate_development",
+        "internal_tools"
+      ]
+    },
+    "owning_team_id": {
+      "$ref": "../common.schema.json#/$defs/team_id"
+    },
+    "sponsor_id": {
+      "$ref": "../common.schema.json#/$defs/employee_id"
+    },
+    "lead_id": {
+      "$ref": "../common.schema.json#/$defs/employee_id"
+    },
+    "member_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "../common.schema.json#/$defs/employee_id"
+      }
+    },
+    "product_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "../common.schema.json#/$defs/product_id"
+      }
+    },
+    "customer_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "../common.schema.json#/$defs/customer_id"
+      }
+    },
+    "project_status": {
+      "enum": [
+        "proposed",
+        "active",
+        "on_hold",
+        "completed",
+        "cancelled"
+      ]
+    },
+    "start_date": {
+      "$ref": "../common.schema.json#/$defs/date"
+    },
+    "target_date": {
+      "$ref": "../common.schema.json#/$defs/nullable_date"
+    },
+    "completed_on": {
+      "$ref": "../common.schema.json#/$defs/nullable_date"
+    },
+    "budget": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/money"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "outcome_metrics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "../common.schema.json#/$defs/snake_case"
+          },
+          "value": {
+            "type": "number"
+          },
+          "unit": {
+            "enum": [
+              "percent",
+              "count",
+              "usd",
+              "days",
+              "hours",
+              "ms"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "value",
+          "unit"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "project_id",
+    "name",
+    "codename",
+    "project_type",
+    "owning_team_id",
+    "sponsor_id",
+    "lead_id",
+    "member_ids",
+    "product_ids",
+    "customer_ids",
+    "project_status",
+    "start_date",
+    "target_date",
+    "completed_on",
+    "budget",
+    "outcome_metrics"
+  ],
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "tenant_id": "T-INSURELLM",
+      "source_system": "pm",
+      "sensitivity_label": "restricted",
+      "record_status": "active",
+      "created_at": "2025-02-03T09:00:00Z",
+      "updated_at": "2025-06-01T09:00:00Z",
+      "project_id": "PROJ-014",
+      "name": "Acquisition of a claims analytics startup",
+      "codename": "Project Lighthouse",
+      "project_type": "corporate_development",
+      "owning_team_id": "TEAM-01",
+      "sponsor_id": "EMP-001",
+      "lead_id": "EMP-040",
+      "member_ids": [
+        "EMP-040",
+        "EMP-045"
+      ],
+      "product_ids": [
+        "PROD-007"
+      ],
+      "customer_ids": [],
+      "project_status": "active",
+      "start_date": "2025-02-03",
+      "target_date": "2025-11-30",
+      "completed_on": null,
+      "budget": {
+        "amount": 4500000,
+        "currency": "USD"
+      },
+      "outcome_metrics": [],
+      "origin": "generated"
+    }
+  ]
+}

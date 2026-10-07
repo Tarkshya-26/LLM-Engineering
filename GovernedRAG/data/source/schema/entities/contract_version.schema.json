@@ -1,0 +1,473 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/entities/contract_version.schema.json",
+  "title": "Contract version",
+  "description": "The commercial terms of one version of a contract. v1 is the original; amendments and renewals add v2, v3, ... entities/contract_versions.jsonl. System of record: clm.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common.schema.json#/$defs/record_envelope"
+    },
+    {
+      "if": {
+        "properties": {
+          "version": {
+            "const": 1
+          }
+        },
+        "required": [
+          "version"
+        ]
+      },
+      "then": {
+        "properties": {
+          "supersedes": {
+            "type": "null"
+          },
+          "change_type": {
+            "const": "original"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "supersedes": {
+            "$ref": "../common.schema.json#/$defs/contract_version_id"
+          },
+          "change_type": {
+            "enum": [
+              "amendment",
+              "renewal",
+              "termination"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "origin": {
+            "const": "generated"
+          }
+        },
+        "required": [
+          "origin"
+        ]
+      },
+      "then": {
+        "properties": {
+          "effective_from": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "term_end": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "term_months": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "auto_renew": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "tier_id": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "monthly_fee": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "total_contract_value": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "payment_terms": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "support_level": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "approved_by": {
+            "not": {
+              "type": "null"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "contract_version_id": {
+      "$ref": "../common.schema.json#/$defs/contract_version_id"
+    },
+    "tenant_id": {
+      "const": "T-INSURELLM"
+    },
+    "source_system": {
+      "const": "clm"
+    },
+    "contract_id": {
+      "$ref": "../common.schema.json#/$defs/contract_id"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "change_type": {
+      "enum": [
+        "original",
+        "amendment",
+        "renewal",
+        "termination"
+      ]
+    },
+    "supersedes": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/contract_version_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "version_status": {
+      "enum": [
+        "current",
+        "superseded",
+        "expired",
+        "terminated"
+      ]
+    },
+    "effective_from": {
+      "$ref": "../common.schema.json#/$defs/nullable_date"
+    },
+    "term_end": {
+      "$ref": "../common.schema.json#/$defs/nullable_date"
+    },
+    "term_months": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "auto_renew": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "renewal_term_months": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "non_renewal_notice_days": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "max_annual_price_increase_pct": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "tier_id": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/tier_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "monthly_fee": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/money"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "total_contract_value": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/money"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "payment_terms": {
+      "enum": [
+        "monthly_in_advance",
+        "net_30",
+        "net_45",
+        "net_60",
+        "annual_upfront",
+        null
+      ]
+    },
+    "user_licenses": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "training_seats": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "volume_commitments": {
+      "type": "array",
+      "description": "Customer-specific volumes stated in the contract, e.g. projected_claims_year_1 = 22000.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "metric": {
+            "$ref": "../common.schema.json#/$defs/snake_case"
+          },
+          "value": {
+            "type": "number",
+            "minimum": 0
+          },
+          "unit": {
+            "enum": [
+              "claims",
+              "policies",
+              "members",
+              "listings",
+              "quotes",
+              "users",
+              "states",
+              "vendors"
+            ]
+          },
+          "period": {
+            "enum": [
+              "month",
+              "year",
+              "year_1",
+              "contract"
+            ]
+          }
+        },
+        "required": [
+          "metric",
+          "value",
+          "unit",
+          "period"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "scope_product_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "../common.schema.json#/$defs/product_id"
+      },
+      "description": "All products covered by this version. Scope changes are an amendment trigger."
+    },
+    "support_level": {
+      "enum": [
+        "standard",
+        "priority",
+        "premium",
+        "dedicated",
+        null
+      ]
+    },
+    "change_summary": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/short_text"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Null for v1. One line, e.g. 'Licenses 35 -> 50; fee $12,000 -> $15,500'."
+    },
+    "approved_by": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/employee_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "termination_notice_days": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "setup_fee": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/money"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "per_lead_fee": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/money"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "fee_schedule": {
+      "type": "array",
+      "description": "Stepped pricing: monthly fee by contract month. Empty when one fee applies throughout.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "from_month": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "to_month": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "monthly_fee": {
+            "$ref": "../common.schema.json#/$defs/money"
+          }
+        },
+        "required": [
+          "from_month",
+          "to_month",
+          "monthly_fee"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "contract_version_id",
+    "contract_id",
+    "version",
+    "change_type",
+    "supersedes",
+    "version_status",
+    "effective_from",
+    "term_end",
+    "term_months",
+    "auto_renew",
+    "renewal_term_months",
+    "non_renewal_notice_days",
+    "termination_notice_days",
+    "max_annual_price_increase_pct",
+    "tier_id",
+    "monthly_fee",
+    "fee_schedule",
+    "setup_fee",
+    "per_lead_fee",
+    "total_contract_value",
+    "payment_terms",
+    "user_licenses",
+    "training_seats",
+    "volume_commitments",
+    "scope_product_ids",
+    "support_level",
+    "change_summary",
+    "approved_by"
+  ],
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "tenant_id": "T-INSURELLM",
+      "source_system": "clm",
+      "sensitivity_label": "confidential",
+      "record_status": "active",
+      "created_at": "2025-05-10T09:00:00Z",
+      "updated_at": "2025-05-10T09:00:00Z",
+      "contract_version_id": "CON-031@v1",
+      "contract_id": "CON-031",
+      "version": 1,
+      "change_type": "original",
+      "supersedes": null,
+      "version_status": "current",
+      "effective_from": "2025-05-10",
+      "term_end": "2026-11-09",
+      "term_months": 18,
+      "auto_renew": true,
+      "renewal_term_months": 12,
+      "non_renewal_notice_days": 45,
+      "max_annual_price_increase_pct": 8,
+      "tier_id": "TIER-020",
+      "monthly_fee": {
+        "amount": 9500,
+        "currency": "USD"
+      },
+      "total_contract_value": {
+        "amount": 171000,
+        "currency": "USD"
+      },
+      "payment_terms": "monthly_in_advance",
+      "user_licenses": null,
+      "training_seats": 30,
+      "volume_commitments": [
+        {
+          "metric": "projected_claims",
+          "value": 22000,
+          "unit": "claims",
+          "period": "year_1"
+        }
+      ],
+      "scope_product_ids": [
+        "PROD-007"
+      ],
+      "support_level": "priority",
+      "change_summary": null,
+      "approved_by": "EMP-034",
+      "fee_schedule": [],
+      "setup_fee": null,
+      "per_lead_fee": null,
+      "termination_notice_days": null,
+      "origin": "kb_seed"
+    }
+  ]
+}

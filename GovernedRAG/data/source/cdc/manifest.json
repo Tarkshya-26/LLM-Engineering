@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0",
+  "dataset_version": "1.0.0",
+  "generated_at": "2026-10-07T00:00:00Z",
+  "generator_seed": 20251006,
+  "t0_snapshot_at": "2025-06-30T23:59:59Z",
+  "batches": [
+    {
+      "batch_id": "BATCH-00",
+      "label": "Initial load (T0 snapshot)",
+      "scenario": "t0_snapshot",
+      "starts_at": "2025-06-30T23:59:59Z",
+      "ends_at": "2025-06-30T23:59:59Z",
+      "event_count": 0,
+      "checkpoint_id": "CP-T0"
+    },
+    {
+      "batch_id": "BATCH-01",
+      "label": "Q3 rebuild: new functions, new customers, expirations",
+      "scenario": "mixed",
+      "starts_at": "2025-07-01T00:00:00Z",
+      "ends_at": "2025-08-15T23:59:59Z",
+      "event_count": 204,
+      "checkpoint_id": "CP-B01"
+    },
+    {
+      "batch_id": "BATCH-02",
+      "label": "Contract amendments, renewals and a list-price change",
+      "scenario": "amendments_and_price_changes",
+      "starts_at": "2025-08-16T00:00:00Z",
+      "ends_at": "2025-09-30T23:59:59Z",
+      "event_count": 76,
+      "checkpoint_id": "CP-B02"
+    },
+    {
+      "batch_id": "BATCH-03",
+      "label": "Access changes: transfer, re-org, termination, tenant suspension",
+      "scenario": "access_changes",
+      "starts_at": "2025-10-01T00:00:00Z",
+      "ends_at": "2025-10-31T23:59:59Z",
+      "event_count": 28,
+      "checkpoint_id": "CP-B03"
+    },
+    {
+      "batch_id": "BATCH-04",
+      "label": "Archival, erasure and policy revisions",
+      "scenario": "archival_and_deletion",
+      "starts_at": "2025-11-01T00:00:00Z",
+      "ends_at": "2025-12-15T23:59:59Z",
+      "event_count": 46,
+      "checkpoint_id": "CP-B04"
+    }
+  ]
+}

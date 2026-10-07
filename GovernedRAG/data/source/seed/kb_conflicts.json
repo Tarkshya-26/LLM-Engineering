@@ -1,0 +1,93 @@
+[
+  {
+    "id": "KBC-01",
+    "topic": "Two CEOs",
+    "kb_says": [
+      "employees/Avery Lancaster.md: Job Title 'Co-Founder & Chief Executive Officer (CEO)', 2015 - Present",
+      "Jennifer Rodriguez signs as 'Chief Executive Officer' on 7 contracts (2025)"
+    ],
+    "tests_depend_on": [
+      "Jennifer Rodriguez, CEO of Insurellm, signed the DriveSmart contract",
+      "Avery Lancaster, the founder, salary $225,000"
+    ],
+    "proposed_handling": "Keep both texts verbatim. HR stays authoritative (Avery is CEO). Contract signatures are stored as printed, and Jennifer Rodriguez gets no HR record at T0."
+  },
+  {
+    "id": "KBC-02",
+    "topic": "Headcount",
+    "kb_says": [
+      "company pages: 32 employees (2025); 32 HR files",
+      "Insurellm signatories with no HR file: ['Jennifer Rodriguez', 'Michael Torres', 'Sarah Chen']"
+    ],
+    "tests_depend_on": [
+      "Insurellm currently operates with 32 employees as of 2025",
+      "employees with salary under $80,000 (counted over the 32 files)"
+    ],
+    "proposed_handling": "T0 HR = exactly the 32 files. New hires arrive only in CDC batches after T0, and the company pages get a v2 then (a freshness test)."
+  },
+  {
+    "id": "KBC-03",
+    "topic": "Contract counts",
+    "kb_says": [
+      "overview/about per-line counts: [7, 7, 6, 6, 3, 4, 2, 2] (sum 37)",
+      "about/overview: '32 active contracts'",
+      "contract files per product: {'Healthllm': 4, 'Rellm': 4, 'Bizllm': 4, 'Markellm': 4, 'Carllm': 4, 'Lifellm': 4, 'Claimllm': 4, 'Homellm': 4}"
+    ],
+    "tests_depend_on": [
+      "Which product line has the most active contracts according to the company overview?"
+    ],
+    "proposed_handling": "Keep the pages verbatim (the test asks 'according to the overview'). Entity truth = 32 contract files. New questions about counts cite the entities."
+  },
+  {
+    "id": "KBC-04",
+    "topic": "Homellm launch date",
+    "kb_says": [
+      "about.md lists Homellm among products added in the first five years (by 2020)",
+      "products/Homellm.md roadmap: 'Q1 2024: Launch of Homellm version 1.0'"
+    ],
+    "tests_depend_on": [],
+    "proposed_handling": "launch_date stays null for Homellm; launch_order only for Markellm (first). No new question uses Homellm's launch date."
+  },
+  {
+    "id": "KBC-05",
+    "topic": "Template contracts",
+    "kb_says": [
+      "unfilled placeholders ([Date], [Name]): ['Apex Reinsurance', 'Belvedere Insurance', 'BrightWay Solutions', 'GreenField Holdings', 'GreenValley Insurance', 'Greenstone Insurance', 'Stellar Insurance Co.']",
+      "template signatory names (John Smith, Jane Smith, John Doe, Sarah Johnson): ['EverGuard Insurance', 'Pinnacle Insurance Co.', 'TechDrive Insurance', 'Velocity Auto Solutions']"
+    ],
+    "tests_depend_on": [],
+    "proposed_handling": "Placeholders stay null. Template names are kept as printed and never linked to an employee or principal."
+  },
+  {
+    "id": "KBC-06",
+    "topic": "'Active' contracts past their term",
+    "kb_says": [
+      "company pages: all 32 contracts active",
+      "Velocity (Oct 2023, 12 months), BrightWay (Oct 2023, one year) and GreenField (Nov 2023, 12 months) state no renewal; their terms ended before 2025"
+    ],
+    "tests_depend_on": [],
+    "proposed_handling": "Keep status 'active' at T0 as the KB says; expire or renew them through CDC events in BATCH-01 (a lifecycle test)."
+  },
+  {
+    "id": "KBC-07",
+    "topic": "Maxine Thompson's title",
+    "kb_says": [
+      "Summary: 'Data Engineer'",
+      "Career Progression: 'January 2021 - Present: Senior Data Engineer'"
+    ],
+    "tests_depend_on": [
+      "What product does the IIOTY award winner work on? (keyword 'Senior Data Engineer')"
+    ],
+    "proposed_handling": "Text verbatim. The entity job_title uses the Summary field, with the career line recorded alongside."
+  },
+  {
+    "id": "KBC-08",
+    "topic": "Name collisions (not a conflict, a trap)",
+    "kb_says": [
+      "customer signatory 'Robert Chen' (Fortress) shares a name with employee Robert Chen",
+      "customer signatory 'Marcus Johnson' (Rapid Claims) shares a name with employee Marcus Johnson"
+    ],
+    "tests_depend_on": [],
+    "proposed_handling": "Keep. Annotate as a disambiguation trap; customer signatories are never linked to employees."
+  }
+]

@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/documents/front_matter.schema.json",
+  "title": "Document front matter",
+  "description": "The YAML header at the top of every documents/<source_system>/<document_id>/v<N>.md file. These are SOURCE fields only: what the system of record knows about the document. Chunk, vector and embedding fields are created later by ingestion and are rejected here.",
+  "type": "object",
+  "properties": {
+    "schema_version": { "$ref": "../common.schema.json#/$defs/schema_version" },
+    "document_id": { "$ref": "../common.schema.json#/$defs/document_id" },
+    "version": { "type": "integer", "minimum": 1 },
+    "document_version_id": { "$ref": "../common.schema.json#/$defs/document_version_id", "description": "Always document_id + '@v' + version." },
+    "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "document_type": {
+      "enum": [
+        "employee_profile", "compensation_record", "performance_review",
+        "customer_account_profile", "account_plan",
+        "contract", "contract_amendment", "contract_renewal", "pricing_approval",
+        "financial_report", "department_budget", "receivables_summary", "board_pack",
+        "product_overview", "technical_architecture", "runbook", "company_page", "employee_handbook", "meeting_notes",
+        "policy",
+        "incident_report", "postmortem_summary",
+        "project_brief", "roadmap",
+        "support_ticket",
+        "public_product_page", "press_release", "company_about"
+      ]
+    },
+    "source_system": { "$ref": "../common.schema.json#/$defs/source_system" },
+    "source_uri": { "type": "string", "pattern": "^(hris|crm|clm|erp|wiki|grc|itsm|pm|support|https)://\\S+$", "description": "Where the record lives in its source system. Fictional URIs; public_web uses https://www.insurellm.example/..." },
+    "source_record_ids": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": { "$ref": "../common.schema.json#/$defs/entity_ref" },
+      "description": "Entity rows this document was rendered from. Every fact in the body traces to one of these."
+    },
+    "subject_entities": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": { "$ref": "../common.schema.json#/$defs/entity_ref" },
+      "description": "Every entity the document is about or mentions by id-able name. Superset of source_record_ids. Used for metadata filtering and multi-hop."
+    },
+    "tenant_id": { "$ref": "../common.schema.json#/$defs/tenant_id" },
+    "owner_department_id": { "$ref": "../common.schema.json#/$defs/department_id" },
+    "source_owner_id": { "$ref": "../common.schema.json#/$defs/employee_id", "description": "Accountable person for the content (data owner)." },
+    "sensitivity_label": { "$ref": "../common.schema.json#/$defs/sensitivity_label" },
+    "access_groups": {
+      "type": "array", "uniqueItems": true, "items": { "$ref": "../common.schema.json#/$defs/group_id" },
+      "description": "Group grants. Membership in ANY listed group grants access (subject to tenant and label rules)."
+    },
+    "access_relations": {
+      "type": "array", "uniqueItems": true,
+      "description": "Relationship grants, evaluated against edges at decision time.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "relation": { "$ref": "../common.schema.json#/$defs/relation_rule" },
+          "subject": { "anyOf": [{ "$ref": "../common.schema.json#/$defs/employee_id" }, { "$ref": "../common.schema.json#/$defs/customer_id" }] }
+        },
+        "required": ["relation", "subject"],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": { "properties": { "relation": { "enum": ["self", "manager_of"] } } },
+            "then": { "properties": { "subject": { "$ref": "../common.schema.json#/$defs/employee_id" } } }
+          },
+          {
+            "if": { "properties": { "relation": { "const": "account_team_of" } } },
+            "then": { "properties": { "subject": { "$ref": "../common.schema.json#/$defs/customer_id" } } }
+          }
+        ]
+      }
+    },
+    "access_principals": {
+      "type": "array", "uniqueItems": true, "items": { "$ref": "../common.schema.json#/$defs/principal_id" },
+      "description": "Named-principal grants. Use sparingly (board pack, acquisition project)."
+    },
+    "region": { "$ref": "../common.schema.json#/$defs/region" },
+    "language": { "$ref": "../common.schema.json#/$defs/language" },
+    "status": { "$ref": "../common.schema.json#/$defs/document_status" },
+    "supersedes": { "anyOf": [{ "$ref": "../common.schema.json#/$defs/document_version_id" }, { "type": "null" }] },
+    "content_origin": {
+      "enum": ["internal", "customer_submitted", "public_source"],
+      "description": "Who authored the body. customer_submitted text is untrusted input (support tickets)."
+    },
+    "content_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$", "description": "SHA-256 of the Markdown body after the front matter, UTF-8, LF line endings. The source system's etag; ingestion should verify it, not trust it." },
+    "retention_class": { "enum": ["standard", "personal_data", "financial_record", "legal_hold"] },
+    "created_at": { "$ref": "../common.schema.json#/$defs/datetime", "description": "When version 1 of this document_id was created." },
+    "updated_at": { "$ref": "../common.schema.json#/$defs/datetime", "description": "When THIS version was written." },
+    "valid_from": { "$ref": "../common.schema.json#/$defs/date", "description": "Business validity start (e.g. amendment effective date)." },
+    "valid_to": { "$ref": "../common.schema.json#/$defs/nullable_date" }
+  },
+  "required": ["schema_version", "document_id", "version", "document_version_id", "title", "document_type", "source_system",
+    "source_uri", "source_record_ids", "subject_entities", "tenant_id", "owner_department_id", "source_owner_id",
+    "sensitivity_label", "access_groups", "access_relations", "access_principals", "region", "language", "status",
+    "supersedes", "content_origin", "content_sha256", "retention_class", "created_at", "updated_at", "valid_from", "valid_to"],
+  "additionalProperties": false,
+  "propertyNames": { "not": { "$ref": "../common.schema.json#/$defs/reserved_ingestion_field" } },
+  "allOf": [
+    {
+      "$comment": "Versioning: v1 supersedes nothing; vN supersedes some earlier version.",
+      "if": { "properties": { "version": { "const": 1 } }, "required": ["version"] },
+      "then": { "properties": { "supersedes": { "type": "null" } } },
+      "else": { "properties": { "supersedes": { "$ref": "../common.schema.json#/$defs/document_version_id" } } }
+    },
+    {
+      "$comment": "public and internal documents carry no grants: the label alone decides.",
+      "if": { "properties": { "sensitivity_label": { "enum": ["public", "internal"] } }, "required": ["sensitivity_label"] },
+      "then": { "properties": { "access_groups": { "maxItems": 0 }, "access_relations": { "maxItems": 0 }, "access_principals": { "maxItems": 0 } } }
+    },
+    {
+      "$comment": "confidential and restricted documents need at least one grant, or nobody could read them.",
+      "if": { "properties": { "sensitivity_label": { "enum": ["confidential", "restricted"] } }, "required": ["sensitivity_label"] },
+      "then": {
+        "anyOf": [
+          { "properties": { "access_groups": { "minItems": 1 } } },
+          { "properties": { "access_relations": { "minItems": 1 } } },
+          { "properties": { "access_principals": { "minItems": 1 } } }
+        ]
+      }
+    },
+    {
+      "$comment": "Customer tenants only hold support data, labelled confidential.",
+      "if": { "properties": { "tenant_id": { "pattern": "^T-CUST-" } }, "required": ["tenant_id"] },
+      "then": { "properties": { "source_system": { "const": "support" }, "sensitivity_label": { "const": "confidential" } } }
+    },
+    {
+      "if": { "properties": { "content_origin": { "const": "customer_submitted" } }, "required": ["content_origin"] },
+      "then": { "properties": { "source_system": { "const": "support" } } }
+    },
+    {
+      "if": { "properties": { "source_system": { "const": "public_web" } }, "required": ["source_system"] },
+      "then": { "properties": { "sensitivity_label": { "const": "public" }, "source_uri": { "pattern": "^https://www\\.insurellm\\.example/" } } }
+    },
+    { "if": { "properties": { "source_system": { "const": "hris" } }, "required": ["source_system"] },
+      "then": { "properties": { "document_id": { "pattern": "^DOC-HRIS-" }, "document_type": { "enum": ["employee_profile", "compensation_record", "performance_review"] } } } },
+    { "if": { "properties": { "source_system": { "const": "crm" } }, "required": ["source_system"] },
+      "then": { "properties": { "document_id": { "pattern": "^DOC-CRM-" }, "document_type": { "enum": ["customer_account_profile", "account_plan"] } } } },
+    { "if": { "properties": { "source_system": { "const": "clm" } }, "required": ["source_system"] },
+      "then": { "properties": { "document_id": { "pattern": "^DOC-CLM-" }, "document_type": { "enum": ["contract", "contract_amendment", "contract_renewal", "pricing_approval"] } } } },
+    { "if": { "properties": { "source_system": { "const": "erp" } }, "required": ["source_system"] },
+      "then": { "properties": { "document_id": { "pattern": "^DOC-ERP-" }, "document_type": { "enum": ["financial_report", "department_budget", "receivables_summary", "board_pack"] } } } },
+    { "if": { "properties": { "source_system": { "const": "wiki" } }, "required": ["source_system"] },
+      "then": { "properties": { "document_id": { "pattern": "^DOC-WIKI-" }, "document_type": { "enum": ["product_overview", "technical_architecture", "runbook", "company_page", "employee_handbook", "meeting_notes"] } } } },
+    { "if": { "properties": { "source_system": { "const": "grc" } }, "required": ["source_system"] },
+      "then": { "properties": { "document_id": { "pattern": "^DOC-GRC-" }, "document_type": { "const": "policy" } } } },
+    { "if": { "properties": { "source_system": { "const": "itsm" } }, "required": ["source_system"] },
+      "then": { "properties": { "document_id": { "pattern": "^DOC-ITSM-" }, "document_type": { "enum": ["incident_report", "postmortem_summary"] } } } },
+    { "if": { "properties": { "source_system": { "const": "pm" } }, "required": ["source_system"] },
+      "then": { "properties": { "document_id": { "pattern": "^DOC-PM-" }, "document_type": { "enum": ["project_brief", "roadmap"] } } } },
+    { "if": { "properties": { "source_system": { "const": "support" } }, "required": ["source_system"] },
+      "then": { "properties": { "document_id": { "pattern": "^DOC-SUP-" }, "document_type": { "const": "support_ticket" } } } },
+    { "if": { "properties": { "source_system": { "const": "public_web" } }, "required": ["source_system"] },
+      "then": { "properties": { "document_id": { "pattern": "^DOC-WEB-" }, "document_type": { "enum": ["public_product_page", "press_release", "company_about"] } } } }
+  ],
+  "examples": [{
+    "schema_version": "1.0",
+    "document_id": "DOC-CLM-0031", "version": 2, "document_version_id": "DOC-CLM-0031@v2",
+    "title": "Amendment 1: FastTrack Insurance Services, Claimllm", "document_type": "contract_amendment",
+    "source_system": "clm", "source_uri": "clm://contracts/CON-031/versions/2",
+    "source_record_ids": ["CON-031", "CON-031@v2"], "subject_entities": ["CON-031", "CON-031@v2", "CUST-012", "PROD-007", "EMP-034"],
+    "tenant_id": "T-INSURELLM", "owner_department_id": "DEPT-07", "source_owner_id": "EMP-045",
+    "sensitivity_label": "confidential", "access_groups": ["GRP-legal", "GRP-finance", "GRP-executive"],
+    "access_relations": [{ "relation": "account_team_of", "subject": "CUST-012" }], "access_principals": [],
+    "region": "us", "language": "en", "status": "current", "supersedes": "DOC-CLM-0031@v1",
+    "content_origin": "internal", "content_sha256": "3f9a1c0d5b7e2a4c6e8f0a1b3c5d7e9f1a2b4c6d8e0f1a3b5c7d9e1f2a4b6c8d",
+    "retention_class": "standard", "created_at": "2025-05-10T09:00:00Z", "updated_at": "2025-08-14T11:30:00Z",
+    "valid_from": "2025-09-01", "valid_to": null
+  }]
+}

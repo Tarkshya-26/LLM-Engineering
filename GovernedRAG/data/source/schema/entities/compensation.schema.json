@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/entities/compensation.schema.json",
+  "title": "Compensation record",
+  "description": "One pay period for one employee. Many rows per employee form the pay history; exactly one row per employee has effective_to = null. entities/compensation.jsonl. System of record: hris. Always restricted.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common.schema.json#/$defs/record_envelope"
+    },
+    {
+      "if": {
+        "properties": {
+          "origin": {
+            "const": "generated"
+          }
+        },
+        "required": [
+          "origin"
+        ]
+      },
+      "then": {
+        "properties": {
+          "job_title_at_time": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "bonus_target_pct": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "change_reason": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "approved_by": {
+            "not": {
+              "type": "null"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "compensation_id": {
+      "$ref": "../common.schema.json#/$defs/compensation_id"
+    },
+    "tenant_id": {
+      "const": "T-INSURELLM"
+    },
+    "source_system": {
+      "const": "hris"
+    },
+    "sensitivity_label": {
+      "const": "restricted"
+    },
+    "employee_id": {
+      "$ref": "../common.schema.json#/$defs/employee_id"
+    },
+    "effective_from": {
+      "$ref": "../common.schema.json#/$defs/date"
+    },
+    "effective_to": {
+      "$ref": "../common.schema.json#/$defs/nullable_date"
+    },
+    "job_title_at_time": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "base_salary": {
+      "$ref": "../common.schema.json#/$defs/money"
+    },
+    "bonus_target_pct": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 100
+    },
+    "bonus_paid": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/money"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "change_reason": {
+      "enum": [
+        "hire",
+        "promotion",
+        "merit",
+        "market_adjustment",
+        "role_change",
+        "correction",
+        null
+      ]
+    },
+    "approved_by": {
+      "anyOf": [
+        {
+          "$ref": "../common.schema.json#/$defs/employee_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "effective_from_precision": {
+      "$ref": "../common.schema.json#/$defs/date_precision"
+    }
+  },
+  "required": [
+    "compensation_id",
+    "employee_id",
+    "effective_from",
+    "effective_from_precision",
+    "effective_to",
+    "job_title_at_time",
+    "base_salary",
+    "bonus_target_pct",
+    "bonus_paid",
+    "change_reason",
+    "approved_by"
+  ],
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "tenant_id": "T-INSURELLM",
+      "source_system": "hris",
+      "sensitivity_label": "restricted",
+      "record_status": "active",
+      "created_at": "2023-01-02T09:00:00Z",
+      "updated_at": "2023-01-02T09:00:00Z",
+      "compensation_id": "COMP-0147",
+      "employee_id": "EMP-021",
+      "effective_from": "2023-01-01",
+      "effective_to": null,
+      "job_title_at_time": "Senior Data Engineer",
+      "base_salary": {
+        "amount": 120000,
+        "currency": "USD"
+      },
+      "bonus_target_pct": 10,
+      "bonus_paid": null,
+      "change_reason": "merit",
+      "approved_by": "EMP-005",
+      "effective_from_precision": "day",
+      "origin": "generated"
+    }
+  ]
+}

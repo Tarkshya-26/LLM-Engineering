@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/access_control/principal.schema.json",
+  "title": "Principal (user or service account)",
+  "description": "Anyone or anything that can ask the RAG system a question. access_control/principals.jsonl. Employees, customer portal users and service accounts share one table so authorization has one input shape.",
+  "type": "object",
+  "properties": {
+    "schema_version": { "$ref": "../common.schema.json#/$defs/schema_version" },
+    "principal_id": { "$ref": "../common.schema.json#/$defs/principal_id" },
+    "principal_type": { "enum": ["employee", "customer_user", "service_account"] },
+    "display_name": { "type": "string", "minLength": 1 },
+    "email": { "type": "string", "pattern": "^[a-z0-9._-]+@[a-z0-9-]+(\\.[a-z0-9-]+)*\\.example$", "description": "All domains are .example (reserved, never real)." },
+    "home_tenant_id": { "$ref": "../common.schema.json#/$defs/tenant_id" },
+    "employee_id": { "anyOf": [{ "$ref": "../common.schema.json#/$defs/employee_id" }, { "type": "null" }] },
+    "customer_id": { "anyOf": [{ "$ref": "../common.schema.json#/$defs/customer_id" }, { "type": "null" }] },
+    "customer_role": { "enum": ["portal_admin", "portal_member", null] },
+    "service_scopes": {
+      "type": "array", "uniqueItems": true,
+      "items": { "$ref": "../common.schema.json#/$defs/tenant_id" },
+      "description": "Service accounts only: tenants the account may act in."
+    },
+    "principal_status": { "enum": ["active", "disabled", "deleted"] },
+    "created_at": { "$ref": "../common.schema.json#/$defs/datetime" },
+    "disabled_at": { "$ref": "../common.schema.json#/$defs/nullable_datetime" }
+  },
+  "required": ["schema_version", "principal_id", "principal_type", "display_name", "email", "home_tenant_id", "employee_id",
+    "customer_id", "customer_role", "service_scopes", "principal_status", "created_at", "disabled_at"],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": { "properties": { "principal_type": { "const": "employee" } }, "required": ["principal_type"] },
+      "then": { "properties": {
+        "principal_id": { "pattern": "^P-EMP-\\d{3}$" }, "home_tenant_id": { "const": "T-INSURELLM" },
+        "employee_id": { "$ref": "../common.schema.json#/$defs/employee_id" }, "customer_id": { "type": "null" },
+        "customer_role": { "const": null }, "service_scopes": { "maxItems": 0 }, "email": { "pattern": "@insurellm\\.example$" } } }
+    },
+    {
+      "if": { "properties": { "principal_type": { "const": "customer_user" } }, "required": ["principal_type"] },
+      "then": { "properties": {
+        "principal_id": { "pattern": "^P-CUS-\\d{4}$" }, "home_tenant_id": { "pattern": "^T-CUST-\\d{3}$" },
+        "employee_id": { "type": "null" }, "customer_id": { "$ref": "../common.schema.json#/$defs/customer_id" },
+        "customer_role": { "enum": ["portal_admin", "portal_member"] }, "service_scopes": { "maxItems": 0 } } }
+    },
+    {
+      "if": { "properties": { "principal_type": { "const": "service_account" } }, "required": ["principal_type"] },
+      "then": { "properties": {
+        "principal_id": { "pattern": "^P-SVC-\\d{3}$" }, "employee_id": { "type": "null" }, "customer_id": { "type": "null" },
+        "customer_role": { "const": null }, "service_scopes": { "minItems": 1 } } }
+    },
+    {
+      "if": { "properties": { "principal_status": { "const": "active" } }, "required": ["principal_status"] },
+      "then": { "properties": { "disabled_at": { "type": "null" } } },
+      "else": { "properties": { "disabled_at": { "$ref": "../common.schema.json#/$defs/datetime" } } }
+    }
+  ],
+  "examples": [
+    {
+      "schema_version": "1.0", "principal_id": "P-EMP-021", "principal_type": "employee", "display_name": "Maxine Thompson",
+      "email": "maxine.thompson@insurellm.example", "home_tenant_id": "T-INSURELLM", "employee_id": "EMP-021", "customer_id": null,
+      "customer_role": null, "service_scopes": [], "principal_status": "active", "created_at": "2017-01-09T09:00:00Z", "disabled_at": null
+    },
+    {
+      "schema_version": "1.0", "principal_id": "P-CUS-0004", "principal_type": "customer_user", "display_name": "Portal user, FastTrack claims ops",
+      "email": "claims.ops@fasttrack-insurance.example", "home_tenant_id": "T-CUST-012", "employee_id": null, "customer_id": "CUST-012",
+      "customer_role": "portal_member", "service_scopes": [], "principal_status": "active", "created_at": "2025-05-20T09:00:00Z", "disabled_at": null
+    }
+  ]
+}

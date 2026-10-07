@@ -1,0 +1,2324 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/relationships/edge.schema.json",
+  "title": "Relationship edge",
+  "description": "One typed, time-bounded link between two entities. relationships/edges.jsonl. Every edge is DERIVED from a foreign-key field named in derived_from, so it can never disagree with the entity tables. A field that changes over time (e.g. customer.account_team_ids) produces an edge whose valid_to closes when the CDC update lands, plus a new edge.",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "$ref": "../common.schema.json#/$defs/schema_version"
+    },
+    "edge_id": {
+      "$ref": "../common.schema.json#/$defs/edge_id"
+    },
+    "relation": {
+      "enum": [
+        "located_at",
+        "member_of_team",
+        "in_department",
+        "reports_to",
+        "team_in_department",
+        "team_located_at",
+        "leads_team",
+        "heads_department",
+        "owns_product",
+        "tech_lead_of",
+        "product_owner_of",
+        "design_lead_of",
+        "tier_of",
+        "account_manager_of",
+        "customer_success_manager_of",
+        "account_team_member_of",
+        "has_portal_tenant",
+        "contract_with",
+        "contract_primary_product",
+        "signed_by",
+        "legal_owner_of",
+        "version_of",
+        "supersedes_contract_version",
+        "covers_product",
+        "uses_tier",
+        "project_owned_by",
+        "sponsor_of",
+        "project_lead_of",
+        "project_member_of",
+        "project_for_product",
+        "project_for_customer",
+        "policy_owned_by",
+        "policy_version_of",
+        "supersedes_policy_version",
+        "incident_commander_of",
+        "incident_responder_of",
+        "incident_affects_product",
+        "incident_affects_customer",
+        "ticket_for_customer",
+        "ticket_for_product",
+        "ticket_under_contract",
+        "ticket_assigned_to",
+        "ticket_related_incident",
+        "compensation_of",
+        "review_of",
+        "reviewed_by",
+        "financial_for_department",
+        "financial_for_product",
+        "financial_mentions_customer"
+      ]
+    },
+    "from_type": {
+      "enum": [
+        "location",
+        "department",
+        "team",
+        "employee",
+        "compensation",
+        "performance_review",
+        "product",
+        "product_tier",
+        "customer",
+        "contract",
+        "contract_version",
+        "project",
+        "policy",
+        "policy_version",
+        "incident",
+        "support_ticket",
+        "financial_record",
+        "tenant"
+      ]
+    },
+    "from_id": {
+      "$ref": "../common.schema.json#/$defs/entity_ref"
+    },
+    "to_type": {
+      "enum": [
+        "location",
+        "department",
+        "team",
+        "employee",
+        "compensation",
+        "performance_review",
+        "product",
+        "product_tier",
+        "customer",
+        "contract",
+        "contract_version",
+        "project",
+        "policy",
+        "policy_version",
+        "incident",
+        "support_ticket",
+        "financial_record",
+        "tenant"
+      ]
+    },
+    "to_id": {
+      "$ref": "../common.schema.json#/$defs/entity_ref"
+    },
+    "derived_from": {
+      "type": "string",
+      "pattern": "^[a-z_]+\\.[a-z_.]+$",
+      "description": "entity_type.field the edge comes from."
+    },
+    "valid_from": {
+      "$ref": "../common.schema.json#/$defs/date"
+    },
+    "valid_to": {
+      "$ref": "../common.schema.json#/$defs/nullable_date"
+    },
+    "introduced_in_batch": {
+      "$ref": "../common.schema.json#/$defs/batch_id"
+    }
+  },
+  "required": [
+    "schema_version",
+    "edge_id",
+    "relation",
+    "from_type",
+    "from_id",
+    "to_type",
+    "to_id",
+    "derived_from",
+    "valid_from",
+    "valid_to",
+    "introduced_in_batch"
+  ],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "from_type": {
+            "const": "location"
+          }
+        },
+        "required": [
+          "from_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_id": {
+            "$ref": "../common.schema.json#/$defs/location_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "to_type": {
+            "const": "location"
+          }
+        },
+        "required": [
+          "to_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "to_id": {
+            "$ref": "../common.schema.json#/$defs/location_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "from_type": {
+            "const": "department"
+          }
+        },
+        "required": [
+          "from_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_id": {
+            "$ref": "../common.schema.json#/$defs/department_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "to_type": {
+            "const": "department"
+          }
+        },
+        "required": [
+          "to_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "to_id": {
+            "$ref": "../common.schema.json#/$defs/department_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "from_type": {
+            "const": "team"
+          }
+        },
+        "required": [
+          "from_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_id": {
+            "$ref": "../common.schema.json#/$defs/team_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "to_type": {
+            "const": "team"
+          }
+        },
+        "required": [
+          "to_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "to_id": {
+            "$ref": "../common.schema.json#/$defs/team_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "from_type": {
+            "const": "employee"
+          }
+        },
+        "required": [
+          "from_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_id": {
+            "$ref": "../common.schema.json#/$defs/employee_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "to_type": {
+            "const": "employee"
+          }
+        },
+        "required": [
+          "to_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "to_id": {
+            "$ref": "../common.schema.json#/$defs/employee_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "from_type": {
+            "const": "compensation"
+          }
+        },
+        "required": [
+          "from_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_id": {
+            "$ref": "../common.schema.json#/$defs/compensation_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "to_type": {
+            "const": "compensation"
+          }
+        },
+        "required": [
+          "to_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "to_id": {
+            "$ref": "../common.schema.json#/$defs/compensation_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "from_type": {
+            "const": "performance_review"
+          }
+        },
+        "required": [
+          "from_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_id": {
+            "$ref": "../common.schema.json#/$defs/review_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "to_type": {
+            "const": "performance_review"
+          }
+        },
+        "required": [
+          "to_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "to_id": {
+            "$ref": "../common.schema.json#/$defs/review_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "from_type": {
+            "const": "product"
+          }
+        },
+        "required": [
+          "from_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_id": {
+            "$ref": "../common.schema.json#/$defs/product_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "to_type": {
+            "const": "product"
+          }
+        },
+        "required": [
+          "to_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "to_id": {
+            "$ref": "../common.schema.json#/$defs/product_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "from_type": {
+            "const": "product_tier"
+          }
+        },
+        "required": [
+          "from_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_id": {
+            "$ref": "../common.schema.json#/$defs/tier_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "to_type": {
+            "const": "product_tier"
+          }
+        },
+        "required": [
+          "to_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "to_id": {
+            "$ref": "../common.schema.json#/$defs/tier_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "from_type": {
+            "const": "customer"
+          }
+        },
+        "required": [
+          "from_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_id": {
+            "$ref": "../common.schema.json#/$defs/customer_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "to_type": {
+            "const": "customer"
+          }
+        },
+        "required": [
+          "to_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "to_id": {
+            "$ref": "../common.schema.json#/$defs/customer_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "from_type": {
+            "const": "contract"
+          }
+        },
+        "required": [
+          "from_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_id": {
+            "$ref": "../common.schema.json#/$defs/contract_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "to_type": {
+            "const": "contract"
+          }
+        },
+        "required": [
+          "to_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "to_id": {
+            "$ref": "../common.schema.json#/$defs/contract_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "from_type": {
+            "const": "contract_version"
+          }
+        },
+        "required": [
+          "from_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_id": {
+            "$ref": "../common.schema.json#/$defs/contract_version_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "to_type": {
+            "const": "contract_version"
+          }
+        },
+        "required": [
+          "to_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "to_id": {
+            "$ref": "../common.schema.json#/$defs/contract_version_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "from_type": {
+            "const": "project"
+          }
+        },
+        "required": [
+          "from_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_id": {
+            "$ref": "../common.schema.json#/$defs/project_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "to_type": {
+            "const": "project"
+          }
+        },
+        "required": [
+          "to_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "to_id": {
+            "$ref": "../common.schema.json#/$defs/project_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "from_type": {
+            "const": "policy"
+          }
+        },
+        "required": [
+          "from_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_id": {
+            "$ref": "../common.schema.json#/$defs/policy_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "to_type": {
+            "const": "policy"
+          }
+        },
+        "required": [
+          "to_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "to_id": {
+            "$ref": "../common.schema.json#/$defs/policy_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "from_type": {
+            "const": "policy_version"
+          }
+        },
+        "required": [
+          "from_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_id": {
+            "$ref": "../common.schema.json#/$defs/policy_version_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "to_type": {
+            "const": "policy_version"
+          }
+        },
+        "required": [
+          "to_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "to_id": {
+            "$ref": "../common.schema.json#/$defs/policy_version_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "from_type": {
+            "const": "incident"
+          }
+        },
+        "required": [
+          "from_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_id": {
+            "$ref": "../common.schema.json#/$defs/incident_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "to_type": {
+            "const": "incident"
+          }
+        },
+        "required": [
+          "to_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "to_id": {
+            "$ref": "../common.schema.json#/$defs/incident_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "from_type": {
+            "const": "support_ticket"
+          }
+        },
+        "required": [
+          "from_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_id": {
+            "$ref": "../common.schema.json#/$defs/ticket_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "to_type": {
+            "const": "support_ticket"
+          }
+        },
+        "required": [
+          "to_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "to_id": {
+            "$ref": "../common.schema.json#/$defs/ticket_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "from_type": {
+            "const": "financial_record"
+          }
+        },
+        "required": [
+          "from_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_id": {
+            "$ref": "../common.schema.json#/$defs/financial_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "to_type": {
+            "const": "financial_record"
+          }
+        },
+        "required": [
+          "to_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "to_id": {
+            "$ref": "../common.schema.json#/$defs/financial_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "from_type": {
+            "const": "tenant"
+          }
+        },
+        "required": [
+          "from_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_id": {
+            "$ref": "../common.schema.json#/$defs/tenant_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "to_type": {
+            "const": "tenant"
+          }
+        },
+        "required": [
+          "to_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "to_id": {
+            "$ref": "../common.schema.json#/$defs/tenant_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "located_at"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "employee"
+          },
+          "to_type": {
+            "const": "location"
+          },
+          "derived_from": {
+            "const": "employee.location_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "member_of_team"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "employee"
+          },
+          "to_type": {
+            "const": "team"
+          },
+          "derived_from": {
+            "const": "employee.team_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "in_department"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "employee"
+          },
+          "to_type": {
+            "const": "department"
+          },
+          "derived_from": {
+            "const": "employee.department_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "reports_to"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "employee"
+          },
+          "to_type": {
+            "const": "employee"
+          },
+          "derived_from": {
+            "const": "employee.manager_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "team_in_department"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "team"
+          },
+          "to_type": {
+            "const": "department"
+          },
+          "derived_from": {
+            "const": "team.department_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "team_located_at"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "team"
+          },
+          "to_type": {
+            "const": "location"
+          },
+          "derived_from": {
+            "const": "team.primary_location_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "leads_team"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "employee"
+          },
+          "to_type": {
+            "const": "team"
+          },
+          "derived_from": {
+            "const": "team.lead_employee_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "heads_department"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "employee"
+          },
+          "to_type": {
+            "const": "department"
+          },
+          "derived_from": {
+            "const": "department.head_employee_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "owns_product"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "team"
+          },
+          "to_type": {
+            "const": "product"
+          },
+          "derived_from": {
+            "const": "team.owned_product_ids"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "tech_lead_of"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "employee"
+          },
+          "to_type": {
+            "const": "product"
+          },
+          "derived_from": {
+            "const": "product.tech_lead_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "product_owner_of"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "employee"
+          },
+          "to_type": {
+            "const": "product"
+          },
+          "derived_from": {
+            "const": "product.product_owner_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "design_lead_of"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "employee"
+          },
+          "to_type": {
+            "const": "product"
+          },
+          "derived_from": {
+            "const": "product.design_lead_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "tier_of"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "product_tier"
+          },
+          "to_type": {
+            "const": "product"
+          },
+          "derived_from": {
+            "const": "product_tier.product_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "account_manager_of"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "employee"
+          },
+          "to_type": {
+            "const": "customer"
+          },
+          "derived_from": {
+            "const": "customer.account_manager_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "customer_success_manager_of"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "employee"
+          },
+          "to_type": {
+            "const": "customer"
+          },
+          "derived_from": {
+            "const": "customer.customer_success_manager_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "account_team_member_of"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "employee"
+          },
+          "to_type": {
+            "const": "customer"
+          },
+          "derived_from": {
+            "const": "customer.account_team_ids"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "has_portal_tenant"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "customer"
+          },
+          "to_type": {
+            "const": "tenant"
+          },
+          "derived_from": {
+            "const": "customer.portal_tenant_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "contract_with"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "contract"
+          },
+          "to_type": {
+            "const": "customer"
+          },
+          "derived_from": {
+            "const": "contract.customer_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "contract_primary_product"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "contract"
+          },
+          "to_type": {
+            "const": "product"
+          },
+          "derived_from": {
+            "const": "contract.primary_product_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "signed_by"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "contract"
+          },
+          "to_type": {
+            "const": "employee"
+          },
+          "derived_from": {
+            "const": "contract.insurellm_signatory_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "legal_owner_of"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "employee"
+          },
+          "to_type": {
+            "const": "contract"
+          },
+          "derived_from": {
+            "const": "contract.legal_owner_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "version_of"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "contract_version"
+          },
+          "to_type": {
+            "const": "contract"
+          },
+          "derived_from": {
+            "const": "contract_version.contract_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "supersedes_contract_version"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "contract_version"
+          },
+          "to_type": {
+            "const": "contract_version"
+          },
+          "derived_from": {
+            "const": "contract_version.supersedes"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "covers_product"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "contract_version"
+          },
+          "to_type": {
+            "const": "product"
+          },
+          "derived_from": {
+            "const": "contract_version.scope_product_ids"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "uses_tier"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "contract_version"
+          },
+          "to_type": {
+            "const": "product_tier"
+          },
+          "derived_from": {
+            "const": "contract_version.tier_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "project_owned_by"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "project"
+          },
+          "to_type": {
+            "const": "team"
+          },
+          "derived_from": {
+            "const": "project.owning_team_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "sponsor_of"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "employee"
+          },
+          "to_type": {
+            "const": "project"
+          },
+          "derived_from": {
+            "const": "project.sponsor_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "project_lead_of"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "employee"
+          },
+          "to_type": {
+            "const": "project"
+          },
+          "derived_from": {
+            "const": "project.lead_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "project_member_of"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "employee"
+          },
+          "to_type": {
+            "const": "project"
+          },
+          "derived_from": {
+            "const": "project.member_ids"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "project_for_product"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "project"
+          },
+          "to_type": {
+            "const": "product"
+          },
+          "derived_from": {
+            "const": "project.product_ids"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "project_for_customer"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "project"
+          },
+          "to_type": {
+            "const": "customer"
+          },
+          "derived_from": {
+            "const": "project.customer_ids"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "policy_owned_by"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "policy"
+          },
+          "to_type": {
+            "const": "department"
+          },
+          "derived_from": {
+            "const": "policy.owner_department_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "policy_version_of"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "policy_version"
+          },
+          "to_type": {
+            "const": "policy"
+          },
+          "derived_from": {
+            "const": "policy_version.policy_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "supersedes_policy_version"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "policy_version"
+          },
+          "to_type": {
+            "const": "policy_version"
+          },
+          "derived_from": {
+            "const": "policy_version.supersedes"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "incident_commander_of"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "employee"
+          },
+          "to_type": {
+            "const": "incident"
+          },
+          "derived_from": {
+            "const": "incident.incident_commander_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "incident_responder_of"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "employee"
+          },
+          "to_type": {
+            "const": "incident"
+          },
+          "derived_from": {
+            "const": "incident.responder_ids"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "incident_affects_product"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "incident"
+          },
+          "to_type": {
+            "const": "product"
+          },
+          "derived_from": {
+            "const": "incident.affected_product_ids"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "incident_affects_customer"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "incident"
+          },
+          "to_type": {
+            "const": "customer"
+          },
+          "derived_from": {
+            "const": "incident.affected_customer_ids"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "ticket_for_customer"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "support_ticket"
+          },
+          "to_type": {
+            "const": "customer"
+          },
+          "derived_from": {
+            "const": "support_ticket.customer_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "ticket_for_product"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "support_ticket"
+          },
+          "to_type": {
+            "const": "product"
+          },
+          "derived_from": {
+            "const": "support_ticket.product_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "ticket_under_contract"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "support_ticket"
+          },
+          "to_type": {
+            "const": "contract"
+          },
+          "derived_from": {
+            "const": "support_ticket.contract_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "ticket_assigned_to"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "support_ticket"
+          },
+          "to_type": {
+            "const": "employee"
+          },
+          "derived_from": {
+            "const": "support_ticket.assignee_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "ticket_related_incident"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "support_ticket"
+          },
+          "to_type": {
+            "const": "incident"
+          },
+          "derived_from": {
+            "const": "support_ticket.related_incident_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "compensation_of"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "compensation"
+          },
+          "to_type": {
+            "const": "employee"
+          },
+          "derived_from": {
+            "const": "compensation.employee_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "review_of"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "performance_review"
+          },
+          "to_type": {
+            "const": "employee"
+          },
+          "derived_from": {
+            "const": "performance_review.employee_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "reviewed_by"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "performance_review"
+          },
+          "to_type": {
+            "const": "employee"
+          },
+          "derived_from": {
+            "const": "performance_review.reviewer_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "financial_for_department"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "financial_record"
+          },
+          "to_type": {
+            "const": "department"
+          },
+          "derived_from": {
+            "const": "financial_record.department_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "financial_for_product"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "financial_record"
+          },
+          "to_type": {
+            "const": "product"
+          },
+          "derived_from": {
+            "const": "financial_record.product_id"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "relation": {
+            "const": "financial_mentions_customer"
+          }
+        },
+        "required": [
+          "relation"
+        ]
+      },
+      "then": {
+        "properties": {
+          "from_type": {
+            "const": "financial_record"
+          },
+          "to_type": {
+            "const": "customer"
+          },
+          "derived_from": {
+            "const": "financial_record.line_items.customer_id"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "relation_catalog": {
+      "description": "Human-readable copy of the rules enforced in allOf.",
+      "const": {
+        "located_at": {
+          "from_type": "employee",
+          "to_type": "location",
+          "derived_from": "employee.location_id"
+        },
+        "member_of_team": {
+          "from_type": "employee",
+          "to_type": "team",
+          "derived_from": "employee.team_id"
+        },
+        "in_department": {
+          "from_type": "employee",
+          "to_type": "department",
+          "derived_from": "employee.department_id"
+        },
+        "reports_to": {
+          "from_type": "employee",
+          "to_type": "employee",
+          "derived_from": "employee.manager_id"
+        },
+        "team_in_department": {
+          "from_type": "team",
+          "to_type": "department",
+          "derived_from": "team.department_id"
+        },
+        "team_located_at": {
+          "from_type": "team",
+          "to_type": "location",
+          "derived_from": "team.primary_location_id"
+        },
+        "leads_team": {
+          "from_type": "employee",
+          "to_type": "team",
+          "derived_from": "team.lead_employee_id"
+        },
+        "heads_department": {
+          "from_type": "employee",
+          "to_type": "department",
+          "derived_from": "department.head_employee_id"
+        },
+        "owns_product": {
+          "from_type": "team",
+          "to_type": "product",
+          "derived_from": "team.owned_product_ids"
+        },
+        "tech_lead_of": {
+          "from_type": "employee",
+          "to_type": "product",
+          "derived_from": "product.tech_lead_id"
+        },
+        "product_owner_of": {
+          "from_type": "employee",
+          "to_type": "product",
+          "derived_from": "product.product_owner_id"
+        },
+        "design_lead_of": {
+          "from_type": "employee",
+          "to_type": "product",
+          "derived_from": "product.design_lead_id"
+        },
+        "tier_of": {
+          "from_type": "product_tier",
+          "to_type": "product",
+          "derived_from": "product_tier.product_id"
+        },
+        "account_manager_of": {
+          "from_type": "employee",
+          "to_type": "customer",
+          "derived_from": "customer.account_manager_id"
+        },
+        "customer_success_manager_of": {
+          "from_type": "employee",
+          "to_type": "customer",
+          "derived_from": "customer.customer_success_manager_id"
+        },
+        "account_team_member_of": {
+          "from_type": "employee",
+          "to_type": "customer",
+          "derived_from": "customer.account_team_ids"
+        },
+        "has_portal_tenant": {
+          "from_type": "customer",
+          "to_type": "tenant",
+          "derived_from": "customer.portal_tenant_id"
+        },
+        "contract_with": {
+          "from_type": "contract",
+          "to_type": "customer",
+          "derived_from": "contract.customer_id"
+        },
+        "contract_primary_product": {
+          "from_type": "contract",
+          "to_type": "product",
+          "derived_from": "contract.primary_product_id"
+        },
+        "signed_by": {
+          "from_type": "contract",
+          "to_type": "employee",
+          "derived_from": "contract.insurellm_signatory_id"
+        },
+        "legal_owner_of": {
+          "from_type": "employee",
+          "to_type": "contract",
+          "derived_from": "contract.legal_owner_id"
+        },
+        "version_of": {
+          "from_type": "contract_version",
+          "to_type": "contract",
+          "derived_from": "contract_version.contract_id"
+        },
+        "supersedes_contract_version": {
+          "from_type": "contract_version",
+          "to_type": "contract_version",
+          "derived_from": "contract_version.supersedes"
+        },
+        "covers_product": {
+          "from_type": "contract_version",
+          "to_type": "product",
+          "derived_from": "contract_version.scope_product_ids"
+        },
+        "uses_tier": {
+          "from_type": "contract_version",
+          "to_type": "product_tier",
+          "derived_from": "contract_version.tier_id"
+        },
+        "project_owned_by": {
+          "from_type": "project",
+          "to_type": "team",
+          "derived_from": "project.owning_team_id"
+        },
+        "sponsor_of": {
+          "from_type": "employee",
+          "to_type": "project",
+          "derived_from": "project.sponsor_id"
+        },
+        "project_lead_of": {
+          "from_type": "employee",
+          "to_type": "project",
+          "derived_from": "project.lead_id"
+        },
+        "project_member_of": {
+          "from_type": "employee",
+          "to_type": "project",
+          "derived_from": "project.member_ids"
+        },
+        "project_for_product": {
+          "from_type": "project",
+          "to_type": "product",
+          "derived_from": "project.product_ids"
+        },
+        "project_for_customer": {
+          "from_type": "project",
+          "to_type": "customer",
+          "derived_from": "project.customer_ids"
+        },
+        "policy_owned_by": {
+          "from_type": "policy",
+          "to_type": "department",
+          "derived_from": "policy.owner_department_id"
+        },
+        "policy_version_of": {
+          "from_type": "policy_version",
+          "to_type": "policy",
+          "derived_from": "policy_version.policy_id"
+        },
+        "supersedes_policy_version": {
+          "from_type": "policy_version",
+          "to_type": "policy_version",
+          "derived_from": "policy_version.supersedes"
+        },
+        "incident_commander_of": {
+          "from_type": "employee",
+          "to_type": "incident",
+          "derived_from": "incident.incident_commander_id"
+        },
+        "incident_responder_of": {
+          "from_type": "employee",
+          "to_type": "incident",
+          "derived_from": "incident.responder_ids"
+        },
+        "incident_affects_product": {
+          "from_type": "incident",
+          "to_type": "product",
+          "derived_from": "incident.affected_product_ids"
+        },
+        "incident_affects_customer": {
+          "from_type": "incident",
+          "to_type": "customer",
+          "derived_from": "incident.affected_customer_ids"
+        },
+        "ticket_for_customer": {
+          "from_type": "support_ticket",
+          "to_type": "customer",
+          "derived_from": "support_ticket.customer_id"
+        },
+        "ticket_for_product": {
+          "from_type": "support_ticket",
+          "to_type": "product",
+          "derived_from": "support_ticket.product_id"
+        },
+        "ticket_under_contract": {
+          "from_type": "support_ticket",
+          "to_type": "contract",
+          "derived_from": "support_ticket.contract_id"
+        },
+        "ticket_assigned_to": {
+          "from_type": "support_ticket",
+          "to_type": "employee",
+          "derived_from": "support_ticket.assignee_id"
+        },
+        "ticket_related_incident": {
+          "from_type": "support_ticket",
+          "to_type": "incident",
+          "derived_from": "support_ticket.related_incident_id"
+        },
+        "compensation_of": {
+          "from_type": "compensation",
+          "to_type": "employee",
+          "derived_from": "compensation.employee_id"
+        },
+        "review_of": {
+          "from_type": "performance_review",
+          "to_type": "employee",
+          "derived_from": "performance_review.employee_id"
+        },
+        "reviewed_by": {
+          "from_type": "performance_review",
+          "to_type": "employee",
+          "derived_from": "performance_review.reviewer_id"
+        },
+        "financial_for_department": {
+          "from_type": "financial_record",
+          "to_type": "department",
+          "derived_from": "financial_record.department_id"
+        },
+        "financial_for_product": {
+          "from_type": "financial_record",
+          "to_type": "product",
+          "derived_from": "financial_record.product_id"
+        },
+        "financial_mentions_customer": {
+          "from_type": "financial_record",
+          "to_type": "customer",
+          "derived_from": "financial_record.line_items.customer_id"
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "edge_id": "EDGE-000412",
+      "relation": "tech_lead_of",
+      "from_type": "employee",
+      "from_id": "EMP-014",
+      "to_type": "product",
+      "to_id": "PROD-002",
+      "derived_from": "product.tech_lead_id",
+      "valid_from": "2021-06-01",
+      "valid_to": null,
+      "introduced_in_batch": "BATCH-00"
+    }
+  ]
+}

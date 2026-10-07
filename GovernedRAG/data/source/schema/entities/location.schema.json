@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.insurellm.example/source/v1/entities/location.schema.json",
+  "title": "Location",
+  "description": "An office or remote hub. One row per location in entities/locations.jsonl. System of record: hris.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common.schema.json#/$defs/record_envelope"
+    },
+    {
+      "if": {
+        "properties": {
+          "origin": {
+            "const": "generated"
+          }
+        },
+        "required": [
+          "origin"
+        ]
+      },
+      "then": {
+        "properties": {
+          "opened_on": {
+            "not": {
+              "type": "null"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "location_id": {
+      "$ref": "../common.schema.json#/$defs/location_id"
+    },
+    "tenant_id": {
+      "const": "T-INSURELLM"
+    },
+    "source_system": {
+      "const": "hris"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "location_type": {
+      "enum": [
+        "headquarters",
+        "office",
+        "remote_hub"
+      ]
+    },
+    "city": {
+      "type": "string"
+    },
+    "state_or_province": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "country": {
+      "type": "string",
+      "pattern": "^[A-Z]{2}$",
+      "description": "ISO 3166-1 alpha-2."
+    },
+    "region": {
+      "$ref": "../common.schema.json#/$defs/region"
+    },
+    "timezone": {
+      "type": "string",
+      "description": "IANA timezone, e.g. America/Chicago."
+    },
+    "opened_on": {
+      "$ref": "../common.schema.json#/$defs/nullable_date"
+    }
+  },
+  "required": [
+    "location_id",
+    "name",
+    "location_type",
+    "city",
+    "state_or_province",
+    "country",
+    "region",
+    "timezone",
+    "opened_on"
+  ],
+  "unevaluatedProperties": false,
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "tenant_id": "T-INSURELLM",
+      "source_system": "hris",
+      "sensitivity_label": "internal",
+      "record_status": "active",
+      "created_at": "2015-03-01T09:00:00Z",
+      "updated_at": "2025-01-10T09:00:00Z",
+      "location_id": "LOC-01",
+      "name": "New York HQ",
+      "location_type": "headquarters",
+      "city": "New York",
+      "state_or_province": "New York",
+      "country": "US",
+      "region": "us",
+      "timezone": "America/New_York",
+      "opened_on": "2015-03-01",
+      "origin": "generated"
+    }
+  ]
+}
